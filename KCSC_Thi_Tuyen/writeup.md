@@ -124,4 +124,57 @@ flag: KCSC{w3ll_d0n3_y0u_g0t_my_s3cr3t_n0w_d04942f299}
 
 
 
+# AntiDebug
+REVERSE
+
+## Description:
+> đề bài cung cấp một file asm: 
+```assembly
+void __cdecl ENC(int a1, int a2, int a3, int a4)
+
+push    ebp
+mov     ebp, esp
+mov     eax, [ebp+0Ch]
+add     eax, [ebp+10h]
+add     eax, [ebp+8]
+mov     ecx, [ebp+14h]
+add     ecx, 0Ah
+xor     ecx, [ebp+8]
+add     eax, ecx
+xor     eax, [ebp+8]
+push    eax             ; char
+push    offset Format   ; "0x%x"
+call    printf
+add     esp, 8
+pop     ebp
+retn
+```
+
+## Solution:
+Đề bài hỏi là kết quả khi gọi hàm: ENC(0xAB12DF34, 0x7B, 0x2D, 0x43) trả về cái gì?
+
+từ đoạn code trên thì mình chuyển sang code c cho dễ nhìn sẽ như này:
+```c
+#include<stdio.h>
+#include<string.h>
+
+void __cdecl ENC(int a1, int a2, int a3, int a4) {
+    int eax = a3;
+    int ecx = a4 + 0xA;
+    eax = eax + a2 + a1;
+    ecx = ecx ^ a1;
+    eax = eax + ecx;
+    eax = eax ^ a1;
+    printf("0x%x", eax);
+}
+
+
+int main(){
+	ENC(0xAB12DF34, 0x7B, 0x2D, 0x43);
+}
+```
+
+sau khi chạy chương trình thì được kết quả là: 0xfd376061
+
+flag: KCSC{0xfd376061}
 
