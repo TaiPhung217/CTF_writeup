@@ -152,6 +152,32 @@ flag: KCSC{w3ll_d0n3_y0u_g0t_my_s3cr3t_n0w_d04942f299}
 
 
 
+# Treasure
+PWN
+
+## Description:
+> đề bài cho một file: treasure
+> There are 3 parts of flag in the binary, try to obtain all parts and the real treasure will be reveal.
+
+## Solution:
+với bài này thì mình sử dụng BinaryNinja để dịch ngược và tìm cờ:
+
+có thể thấy ngay Part 1: KCSC{
+
+![img](./images/17.png)
+
+Part 2 được in ra từ biến var_1f, vì vậy đổi giá trị var_1f từ hex sang string ta được: 4_t1ny_tr34sur3 phải đảo ngược lại
+
+Part 3 thì thực hiện search trong mã nguồn là thấy luôn: _27651d2df78e1998}
+
+![img](./images/18.png)
+
+flag: KCSC{4_t1ny_tr34sur3_27651d2df78e1998}
+
+
+
+
+
 # AntiDebug {#re}
 REVERSE
 
