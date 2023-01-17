@@ -34,5 +34,10 @@ result.save('output.png')
 ```
 sau khi chạy script thì mình có được ảnh này:
 ![img](./images/result3.jpg)
+
 mặc dù thấy rõ hình người rồi nhưng chữ vẫn hơi lệch, không muốn mất thời gian nên mình đi con đường hơi tắt. không sửa lại code nữa mà ghép mấy phần chữ lại lấy flag luôn =)).
+
 ![img](./images/2.png)
+
+flag: KCSC{Zao_shang_hao_zhong_gou!_Xian_zai_wo_you_bing_chilling!!}
+
