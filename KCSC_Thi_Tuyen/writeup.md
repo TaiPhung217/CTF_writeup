@@ -80,3 +80,30 @@ và đây là kết quả:
 
 flag: KCSC{tet_tet_tet_tet_den_roi_chuc_cac_ban_nam_moi_that_nhieu_suc_khoe_luv_from_luluuuuuuuuuuuu}
 
+
+
+# Chuyến tàu vô tận
+Crypto
+
+## Description:
+> Đề bài cho một file chứa dãy nhị phân như này:  01010011 00110001 01000010 01010100 01010110 01101011 00110101 01010110 01010011 01101011 01001010 01010011 01010101 00110000 01000110 01001111 01010001 00110000 01001110 01001101 01010001 01010101 01010110 01000010 01010010 01010101 01010110 01001000 01010011 00110000 01110100 01010000 01010110 01010101 00111001 01000110 01010100 00110000 01010110 01000010 01010110 01000110 01010010 01010101 01010100 00110001 01001110 01000110 01010101 00110001 01001010 01010000 01010111 01010110 01001010 01000111 01010100 01000110 01001110 01001010
+
+## Solution:
+dùng CyberChef giải mã binary và base64 mình được đoạn text này:  KPSVNUJBRSANCCLAEAEEGKKOUOEOEATTTOSESROYRFLSI
+
+dùng công cụ sau để xác định dạng mã hoá: https://www.dcode.fr/cipher-identifier
+
+sau nhiều lần thử quên ăn quên ngủ thì mình đã tìm thấy được dạng mã hoá đúng là Redefence cipher
+đây là công cụ giải mã: https://www.dcode.fr/redefence-cipher
+
+giải mã xong ta sẽ có được flag =))
+![img](./images/4.png)
+
+
+
+# CAT
+Pwnable
+
+## Description:
+> đề bài cho một file elf: cat
+
