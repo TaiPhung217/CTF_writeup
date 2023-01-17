@@ -246,3 +246,21 @@ status trả về là 1 nên có vẻ như đã chính xác, và bài này là m
 giải mã base64: V2VsbCBkb25lISwgaGVyZSBpcyB0aGUgZmxhZzogS0NTQ3tibGluZF94eERfeHhPX3h4XV94eGUhIUAjQH0K ta thu được flag
 
 flag: KCSC{blind_xxD_xxO_xx]_xxe!!@#@}
+
+
+# MAIL
+FORENSIC
+
+## Description:
+> đề bài cho một file: mail.mbox
+
+## Solution:
+bài này mình nộp không kịp.
+mở file này bằng công ục MBOX Viewer
+
+![img](./images/11.png)
+
+ở đoạn tin nhắn này, để ý thấy có đính kèm một file pdf đồng thời có một công là phải tải tài liệu này xuống nên mình nghĩ là phải tải file xuống và tìm flag trong file.
+sau khi tải xuống, đầu tiền mình dùng luôn strings thì tìm thấy flag =))
+
+flag: KCSC{Anata_n0_baka_aho_aho_>///<}
