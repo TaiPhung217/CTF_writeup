@@ -280,5 +280,7 @@ mở file này bằng công ục MBOX Viewer
 ở đoạn tin nhắn này, để ý thấy có đính kèm một file pdf đồng thời có một công là phải tải tài liệu này xuống nên mình nghĩ là phải tải file xuống và tìm flag trong file.
 sau khi tải xuống, đầu tiền mình dùng luôn strings thì tìm thấy flag =))
 
+![img](./images/12.png)
+
 flag: KCSC{Anata_n0_baka_aho_aho_>///<}
 
