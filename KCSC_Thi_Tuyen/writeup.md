@@ -46,12 +46,7 @@ flag: KCSC{Zao_shang_hao_zhong_gou!_Xian_zai_wo_you_bing_chilling!!}
 Crypto
 
 ## Description:
-> Đề bài cho một file chứa những văn bản đã bị mã hoá
-
-## Solution:
-Tải file về được đoạn sau:
-
-lyl, rwns dmsfm rn wkmrx myf iyrx pynljorw, jn luy ejvvynl lxrqjljsmrw pynljorw jm ojyl mrh.
+> Đề bài cho một file chứa những văn bản đã bị mã hoá:  lyl, rwns dmsfm rn wkmrx myf iyrx pynljorw, jn luy ejvvynl lxrqjljsmrw pynljorw jm ojyl mrh.
 lyl jn knkrwwi pxsh luy ymq sp trmkrxi ls yrxwi pyexkrxi. 
 eypsxy lyl, ojylmrhyny cxycrxy hrmi lujmvn psx luy luxyy hrjm qrin. 
 luyi gwyrm luyjx uskny rmq qygsxrly fjlu pwsfyxn nkgu rn dkhbkrl lxyy sx cyrgu ewsnnsh. 
@@ -65,6 +60,7 @@ ls ojylmrhyny, lyl jn luy urccjynl ljhy sp rww iyrx rxskmq, hyheyxn jm r prhjwi 
 rww jm rww, lyl jn rww reskl ergd ls sxjvjmn, ey vssq ls sluyxn, ymtsi luy cxygjskn hshyml, rmq fjnu psx luy eynl ls gshy.
 luy pwrv jn: dgng{lyl_lyl_lyl_lyl_qym_xsj__gukg_grg_erm_mrh_hsj_lurl_mujyk_nkg_dusy__wko_pxsh_wkwkkkkkkkkkkkk}
 
+## Solution:
 
 có thể thấy ngay dòng cuối cùng chính là flag =))
 
@@ -106,4 +102,26 @@ Pwnable
 
 ## Description:
 > đề bài cho một file elf: cat
+
+## Solution:
+chạy thử file cat thì nhận được dòng sau:
+
+![img](./images/5.png)
+
+tiếp theo, mình sử dụng một Binary Ninja để dịch ngược, và nhận thấy username và password:
+
+![img](./images/6.png)
+
+sau khi dùng thông tin trên để đăng nhập thì mình được hỏi phải nhập secret key
+để ý trong binary ninja thì ở chỗ lấy dữ liệu secret key chứ 0x200 byte: read(fd: 0, buf: &secret, nbytes: 0x200)
+
+mình đã thực hiện nhập một chuỗi thật dài để tạo hiệu ứng tràn.
+và mình nhận được cờ luôn =))
+
+![img](./images/7.png)
+
+flag: KCSC{w3ll_d0n3_y0u_g0t_my_s3cr3t_n0w_d04942f299}
+
+
+
 
