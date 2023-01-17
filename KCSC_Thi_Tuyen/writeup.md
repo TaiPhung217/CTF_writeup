@@ -1,5 +1,12 @@
 
 [PROG/MISC](#prog-misc)
+[CRYPTO](#crypto)
+[PWN](#pwn)
+[RE](#re)
+[WED](#web)
+[FORENSIC](#forensic)
+
+
 
 
 # BinggChillinggg {#prog-misc}
@@ -46,7 +53,7 @@ mặc dù thấy rõ hình người rồi nhưng chữ vẫn hơi lệch, không
 flag: KCSC{Zao_shang_hao_zhong_gou!_Xian_zai_wo_you_bing_chilling!!}
 
 
-# Tet_is_ya_best
+# Tet_is_ya_best {#crypto}
 Crypto
 
 ## Description:
@@ -118,7 +125,7 @@ flag: KCSC{Encoding Is Cool!!!}
 
 
 
-# CAT
+# CAT {#pwn}
 Pwnable
 
 ## Description:
@@ -145,7 +152,7 @@ flag: KCSC{w3ll_d0n3_y0u_g0t_my_s3cr3t_n0w_d04942f299}
 
 
 
-# AntiDebug
+# AntiDebug {#re}
 REVERSE
 
 ## Description:
@@ -203,7 +210,7 @@ flag: KCSC{0xfd376061}
 
 
 
-# HI HI HI
+# HI HI HI {#web}
 WED
 
 ## Description:
@@ -320,7 +327,7 @@ giải mã base64: V2VsbCBkb25lISwgaGVyZSBpcyB0aGUgZmxhZzogS0NTQ3tibGluZF94eERfe
 flag: KCSC{blind_xxD_xxO_xx]_xxe!!@#@}
 
 
-# MAIL
+# MAIL {#forensic}
 FORENSIC
 
 ## Description:
