@@ -1,4 +1,8 @@
-# BinggChillinggg
+
+[PROG/MISC](#prog-misc)
+
+
+# BinggChillinggg {#prog-misc}
 Prog/Misc
 
 ## Description:
