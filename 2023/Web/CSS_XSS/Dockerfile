@@ -23,7 +23,7 @@ COPY package.json .
 
 ENV NODE_ENV production
 # ENV DOMAIN chall.csivit.com:20000
-ENV FLAG flag{css_injection}
+ENV FLAG flag{cssinjection}
 ENV PORT 9999
 RUN npm install
 
