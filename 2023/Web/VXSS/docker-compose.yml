@@ -1,0 +1,6 @@
+version: "3.8"
+services:
+  xss-bot:
+    build: bot/.
+    ports:
+      - "51001:3000"
