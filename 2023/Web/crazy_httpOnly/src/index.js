@@ -5,7 +5,7 @@ const cookieParser = require("cookie-parser");
 
 const flag = process.env.FLAG;
 const port = parseInt(process.env.PORT) || 8080;
-const adminpw = process.env.ADMINPW || "adminadmin";
+const adminpw = process.env.ADMINPW || "admin-cookie-fake";
 
 const app = express();
 
@@ -50,17 +50,17 @@ app.use((req, res, next) => {
 
 app.post("/report", (req, res) => {
     res.type("text/plain");
-    const crime = req.body.crime;
-    if (typeof crime !== "string") {
-        res.status(400).send("crime is not provided");
+    const dinosaur = req.body.dinosaur;
+    if (typeof dinosaur !== "string") {
+        res.status(400).send("dinosaur is not provided");
         return;
     }
-    if (crime.length > 2048) {
+    if (dinosaur.length > 2048) {
         res.status(400).send("server overload :> you do not have permission to do that");
         return;
     }
     const id = uuid();
-    reports.set(id, crime);
+    reports.set(id, dinosaur);
     cleanup.push([id, Date.now() + 1000 * 60 * 60 * 3]);
     res.redirect("/report/" + id);
 });
