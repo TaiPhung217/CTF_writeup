@@ -97,4 +97,23 @@ Nhưng web nó đang nhận ra mình. bắt request để xem thì mình nhận 
 ![img](./image/5.png)
 
 Cookie token:
->eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoicm9va2llIiwiaWF0IjoxNjc4NjExMDc3fQ.aMv-lbcMs-YwKR9AxEtugF1Uz4FUjM0lKJrAYqYIZVMdPvVOryb2ZzcfHIX0ExsdFEMvclzhI4wV-ppNImTNDNGw7fZElZO1rejEzhjfyuOiUUDfx3Xh-aA847TBZ5Edhjvqafja90ny0f6k04SYYpj7KFeaWZwQJdBZcREtRvPV3Vd8QiXuqHqLPBd5BYijyMELV8Hbyjq96nvQUrPlhCBgTLiZuZZeltQ8rB13EjX0BzgdbrCMXjd-kToVzNj6igHegGJILE4usPdsBorCnkmApsinNCX7P2dsvHzhQUjX2vup4F-c2KTkVK37IXWe-vQwrGv8MiGuPkO55GsqF25_kOueX7067Mb4j3ZgtO16eioGWpEFszMdAfrddGFwDdZwo2o0RuBqiwenDCUa-VAPrrm6BMIMbwLWHbWStJ-NUNJ-7gCDPIbzQHsWnMgCiJ7r4QNFoVhPHxDUn102z8WfShyRBkaYNp0wStRhaAnrJVGDnlmh80Ah4Eb4SFb5RCdoXzij2nC8N40yHZ9RVgpMluuhsqT7PAljmAfdqZ9VZIFQIl-hmPvg4450mCaE2OeADmCNPgtrkGtd9s5lM7QwZquuThxHflJclp5c8nINKclOL48GOXSJXMjtL2Ciod48G1hlILSZsy774dzFcSOFmHlJnqfRsDzoSHTmIOM
+>eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoicm9va2llIiwiaWF0IjoNjc4NjExMDc3fQ.aMvlbcMsYwKR9AxEtugF1Uz4FUjM0lKJrAYqYIZVMdPvVOryb2ZzcfHIX0ExsdFEMvclzhI4wVppNImTNDNGw7fZElZO1rejEzhjfyuOiUUDfx3XhaA847TBZ5Edhjvqafja90ny0f6k04SYYpj7KFeaWZwQJdBZcREtRvPV3Vd8QiXuqHqLPBd5BYijyMELV8Hbyjq96nvQUrPlhCBgTLiZuZZeltQ8rB13EjX0BzgdbrCMXjdkToVzNj6igHegGJILE4usPdsBorCnkmApsinNCX7P2dsvHzhQUjX2vup4Fc2KTkVK37IXWevQwrGv8MiGuPkO55GsqF25_kOueX7067Mb4j3ZgtO16eioGWpEFszMdAfrddGFwDdZwo2o0RuBqiwenDCUaVAPrrm6BMIMbwLWHbWStJNUNJ7gCDPIbzQHsWnMgCiJ7r4QNFoVhPHxDUn102z8WfShyRBkaYNp0wStRhaAnrJVGDnlmh80Ah4Eb4SFb5RCdoXzij2nC8N40yHZ9RVgpMluuhsqT7PAljmAfdqZ9VZIFQIlhmPvg4450mCaE2OeADmCNPgtrkGtd9s5lM7QwZquuThxHflJclp5c8nINKclOL48GOXSJXMjtL2Ciod48G1hlILSZsy774dzFcSOFmHlJnqfRsDzoSHTmIOM
+
+Mình đưa token này vào tool sau để giải mã:  https://jwt.io/
+
+![img](./image/6.png)
+
+Đến đây thì có thể lý giải lo do vì sao web nhận diện được mình login với tư cách là `rookie`.
+Mã JWT này là RS256 và có trường role là rookie
+
+trong trang login ta có thể thấy một dòng chữ "Applying for role hacker ?"
+Điều này cho thấy ta cần thay đổi giá trị role trong mã jwt thành hacker để có thể truy cập được dữ liệu khác trong máy tính.  Đến đây mình vẫn chưa tìm thấy chỗ UPload ở đây cả?
+khả năng cao phải tạo được token mới , mới truy cập được chức năng upload.
+
+Đến đây mình có thể xây dựng ý tưởng như sau:
+    - Khôi phục mã RSA private key
+    - Sử dụng khoá RSA sau khi đã khôi phục để có thể chỉnh sửa được trường role thành "hacker"
+
+### Khôi phục mã RSA private key
+
+
