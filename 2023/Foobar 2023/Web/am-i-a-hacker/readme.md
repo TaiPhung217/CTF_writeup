@@ -84,4 +84,17 @@ Fnw3QQKCAQEAyEzWTudXDHFq1vVCxQsujpmHnjVzrCjJ3NBlb5q2ancyiTJD+eUJ
 -----END RSA PRIVATE KEY-----
 ```
 
+ựa , đây là mã RSA private key nhưng bị khuất mất vài chỗ.
 
+Cứ để tạm đây đã.
+
+Thử khai thác chỗ login xem, thì mình nhận thấy mặc dùng là trang login nhưng nhập username,password gì cũng login được.
+
+![img](./image/4.png)
+
+Nhưng web nó đang nhận ra mình. bắt request để xem thì mình nhận được một đoạn token như sau:
+
+![img](./image/5.png)
+
+Cookie token:
+>eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoicm9va2llIiwiaWF0IjoxNjc4NjExMDc3fQ.aMv-lbcMs-YwKR9AxEtugF1Uz4FUjM0lKJrAYqYIZVMdPvVOryb2ZzcfHIX0ExsdFEMvclzhI4wV-ppNImTNDNGw7fZElZO1rejEzhjfyuOiUUDfx3Xh-aA847TBZ5Edhjvqafja90ny0f6k04SYYpj7KFeaWZwQJdBZcREtRvPV3Vd8QiXuqHqLPBd5BYijyMELV8Hbyjq96nvQUrPlhCBgTLiZuZZeltQ8rB13EjX0BzgdbrCMXjd-kToVzNj6igHegGJILE4usPdsBorCnkmApsinNCX7P2dsvHzhQUjX2vup4F-c2KTkVK37IXWe-vQwrGv8MiGuPkO55GsqF25_kOueX7067Mb4j3ZgtO16eioGWpEFszMdAfrddGFwDdZwo2o0RuBqiwenDCUa-VAPrrm6BMIMbwLWHbWStJ-NUNJ-7gCDPIbzQHsWnMgCiJ7r4QNFoVhPHxDUn102z8WfShyRBkaYNp0wStRhaAnrJVGDnlmh80Ah4Eb4SFb5RCdoXzij2nC8N40yHZ9RVgpMluuhsqT7PAljmAfdqZ9VZIFQIl-hmPvg4450mCaE2OeADmCNPgtrkGtd9s5lM7QwZquuThxHflJclp5c8nINKclOL48GOXSJXMjtL2Ciod48G1hlILSZsy774dzFcSOFmHlJnqfRsDzoSHTmIOM
