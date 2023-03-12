@@ -493,6 +493,8 @@ rồi sau đó mình sẽ ZIP trở lại như cũ bằng lệnh:
 
 Bây giờ chúng ta chỉ cần upload file này lên hệ thống và lấy flag thôi . hihihihi
 
+![img](./image/14.png)
+
 
 ![img](./image/13.png)
 
