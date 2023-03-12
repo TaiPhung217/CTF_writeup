@@ -57,3 +57,5 @@ Ok bây giờ chúng ta có được một đống cờ giả.
 search từ khoá : flag ta nhận được cờ thật
 
 ![img](./image/5.png)
+
+Flag:  GLUG{1nsp3c7_1n_gr4phq6}
