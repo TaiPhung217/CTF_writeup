@@ -1,0 +1,2 @@
+
+tìm cách sha1 mã được cung cấp là lấy được flag:  flag{1ick_twi5t_dunk}

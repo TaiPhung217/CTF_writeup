@@ -1,0 +1,4 @@
+cyber chef:
+from binary -> reverse -> form hex-> from binary 
+
+flag: flag{strange_numbers_011d0d0f9f0f9}

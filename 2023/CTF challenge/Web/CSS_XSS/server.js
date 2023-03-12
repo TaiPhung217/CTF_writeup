@@ -49,4 +49,4 @@ app.get('/view', (req, res) => {
 
 app.get('/', (req, res) => {
     res.redirect('/view');
-});
+}); 
