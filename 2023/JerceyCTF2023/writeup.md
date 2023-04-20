@@ -1,5 +1,4 @@
 
-### đây là một số bài mình giải quyết được trong ctf này
 `put-the-cookie-down   WEB   50  Point
 poisoned              WEB   688 Point
 sho-me-how-to-mine    Osint 614 Point
