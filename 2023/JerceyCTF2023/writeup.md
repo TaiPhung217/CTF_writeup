@@ -1,9 +1,9 @@
-# put-the-cookie-down   WEB   50  Point
-# poisoned              WEB   688 Point
-# sho-me-how-to-mine    Osint 614 Point
-# using-the-map         Osint 677 Point
-# crack-keepass         Misc  97  Point
-# securing-environments Misc  747 Point
+>> put-the-cookie-down   WEB   50  Point
+>> poisoned              WEB   688 Point
+>> sho-me-how-to-mine    Osint 614 Point
+>> using-the-map         Osint 677 Point
+>> crack-keepass         Misc  97  Point
+>> securing-environments Misc  747 Point
 
 # put-the-cookie-down
 WEB
