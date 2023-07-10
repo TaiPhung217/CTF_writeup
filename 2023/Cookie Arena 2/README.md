@@ -1,6 +1,6 @@
 Xin chào mọi người,
-Tôi rất vui chia sẻ với các bạn write-up của tôi về cuộc thi CTF Cookie Arena lần thứ 2 diễn ra vào tối qua. Đây là một bài viết tổng hợp kinh nghiệm và phân tích các bài thử thách trong cuộc thi. Tôi hy vọng rằng những thông tin và giải thích trong write-up này sẽ giúp các bạn hiểu rõ hơn về các bài tập và cải thiện kỹ năng giải quyết vấn đề của mình.
-Tôi rất mong nhận được sự phản hồi và đóng góp từ mọi người. Nếu bạn phát hiện bất kỳ sai sót hoặc có bất kỳ câu hỏi hoặc ý kiến nào, xin vui lòng liên hệ với tôi. Cảm ơn đã đọc và hãy cùng khám phá CTF Cookie Arena lần thứ 2 này! 😄
+Mình rất vui chia sẻ với các bạn write-up của mình về cuộc thi CTF Cookie Arena lần thứ 2 diễn ra vào tối qua. Đây là một bài viết tổng hợp kinh nghiệm và phân tích các bài thử thách trong cuộc thi. Mình hy vọng rằng những thông tin và giải thích trong write-up này sẽ giúp các bạn hiểu rõ hơn về các chall trong CTF này cũng như hướng giải quyết vấn đề của mình. 😄
+Mình rất mong nhận được sự phản hồi và đóng góp từ mọi người. Nếu bạn phát hiện bất kỳ sai sót hoặc có bất kỳ câu hỏi hoặc ý kiến nào, xin vui lòng liên hệ với tôi. Cảm ơn đã đọc và hãy cùng khám phá CTF Cookie Arena lần thứ 2 này! 😄
 
 # Web challenges
 ## Magic Login
@@ -123,9 +123,11 @@ Content-Type: application/octet-stream
 kết quả thành công 🕶️ mình nhận được link tới file là `uploads/1915122261.php`.
 Dán vào trình duyệt và thực thi lệnh với `/uploads/1915122261.php?cmd=id`.
 Kết quả thành công có một webshell:
+
 ![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/c97de475-0215-4df0-bd0a-51bd7609cbc9)
 
 Đọc flag trong `/flag.txt`
+
 ![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/a6c7b03d-92b5-4782-aa95-c95bffb29326)
 
 
@@ -144,9 +146,11 @@ Nếu bạn không tìm thấy source code trên drive nữa thì có thể tìm
 
 ### Phân tích
 Mình được cung cấp một form đăng nhập cơ bản gồm 2 trường username và password nữa.
+
 ![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/18470ba2-1531-41a4-ac22-c98d035d5dac)
 
 Mã nguồn được cung cấp gồm các file như sau:
+
 ![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/ff68437f-12ed-412b-b8a2-c7b62db3dc9b)
 
 * File `entrypoint.sh`:
@@ -199,13 +203,15 @@ Tuy nhiên, mình đã từng gặp dạng này trước đây khi làm việc v
 Một ví dụ: https://crypto.stackexchange.com/questions/1434/are-there-two-known-strings-which-have-the-same-md5-hash-value?fbclid=IwAR2SiSjwjf3JbJwnOjqmqw7bHriFieA_oIBhH1opA47TCHVuWxFjQn99FJk
 
 Xem thử một nhận xét:
+
 ![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/3bcc0309-0d22-4fe5-856a-5bdfb12cf0cd)
 
 Vậy là khi thực hiện lệnh `md5sum` cho byte của hai file trên thì sẽ cho cùng một mã md5. Nếu bạn thắc mắc chuỗi hexa kia người ta lấy từ đâu thì có thể chạy thử trên máy như sau.
+
 ![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/1ebbb19c-3797-45b7-8eb9-ff7a6d1243af)
 Có thể thấy file được hash giống nhau. Và chuỗi string kia là biểu diễn hexa của file.
-![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/33b10fe7-1904-48b8-8100-67b2a10c97b3)
 
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/33b10fe7-1904-48b8-8100-67b2a10c97b3)
 Vậy là xong, mình sẽ sang bước bypass của mình.
 
 * File `admin.php`:
@@ -272,6 +278,7 @@ output:
 Mình sẽ gửi payload lên form đăng nhập.
 Server trả về thông báo lỗi???? lạ vậy.
 Mình không nghĩ sẽ có lỗi gì xảy ra ở đây. 
+
 ![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/e40df438-fc56-4fd0-861f-3ced70aac6bf)
 Lỗi cho thấy: Không thể chỉnh sửa thông tin header và lỗi xảy ra tại dòng thứ 73.
 
@@ -279,6 +286,7 @@ Nhìn vào source code thì mình thấy dòng 73 là `$_SESSION['username'] = $
 Vậy là chứng tỏ ta đã bypass thành công. Dòng mã 73 đã được thực thi. 🥇
 
 Tại sao nó xuất hiện lỗi??? Bạn có thể thấy là ở đây đang truyền trực tiếp `$username` và giá trị `username` trong SESSION. Tuy nhiên, mình đã thử debug giá trị `$username` trông như sau:
+
 ![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/d504ee66-9af2-40b7-ac23-3beb609aea95)
 
 `$username` dòng code thứ 73 sẽ lưu trữ dữ liệu chứa các ký tự không thể hiển thị gây tạo ra lỗi. Nhưng lỗi đó không ảnh hưởng tới việc tạo session đăng nhập.
@@ -296,12 +304,15 @@ Strict-Transport-Security: max-age=15724800; includeSubDomains
 ```
 
 Dùng session này mình có thể truy cập file admin bình thường.
+
 ![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/cf150148-692e-4f9c-bf37-cafc96ebb765)
 
 Đọc file `/admin.php?file=../etc/passwd`:
+
 ![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/e6bfa21c-626f-4d6c-b9af-73b3f7e168cd)
 
 Đọc `/proc/mounts`:
+
 ![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/bb6b90fc-8eab-4517-9bb9-de525d2022e0)
 
 tên file flag đã bị mã hóa, mình sẽ cố xem tên file có thể được lưu đâu đó không. 
@@ -310,9 +321,11 @@ Chắc không ổn rồi. Mình không thấy. Hoặc cũng có thể do mình k
 Mình sẽ theo hướng brute force vậy. Nhưng server Cookie han hoan toàn giới hạn request 😧
 
 Nhớ tại tên file flag sẽ có dạng như sau: `/flag****.txt`
+
 ![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/dfb90fe7-3fd7-4fd2-9f84-0c91e1ccd0b1)
 
 Setup Intruder burpsuite như sau:
+
 ![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/0c35f184-0158-48a3-adc8-31dcbb2f61ea)
 
 
@@ -331,8 +344,7 @@ Có một chức năng đơn giản là nhận đầu vào là một url video c
 Đầu vào cho phép phải là một url
 
 ![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/093e88b8-d1f6-4092-924f-94c34dcf8cbd)
-
-Cho những ai chưa biết thì. thumbnail là hình ảnh thu nhỏ được sử dụng để đại diện cho một video trên internet, đặc biệt xuất hiện nhiều trong các nền tảng chia sẻ video như Youtube, Facebook và Instagram. Thường được hiển thị bên cạnh tiêu đều và mô tả video để thu hút sự chú ý của người xem và tạo ấn tượng 👽
+Cho bạn nào chưa biết 🍻 thì. thumbnail là hình ảnh thu nhỏ được sử dụng để đại diện cho một video trên internet, đặc biệt xuất hiện nhiều trong các nền tảng chia sẻ video như Youtube, Facebook và Instagram. Thường được hiển thị bên cạnh tiêu đều và mô tả video để thu hút sự chú ý của người xem và tạo ấn tượng 👽
 
 Ví dụ mình thử nhập một liên kết như sau:
 
@@ -528,7 +540,6 @@ nó sẽ lấy số dư hiện tại trừ cho giá trị `amount` để cập n
 Kiểm tra số dư trong tài khoản của `alice` mình thấy số dư đã được tăng lên thành công. 🚡
 
 ![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/63727f5d-80df-4fb0-980d-dddc03c824a9)
-
 Mua flag và mình nhận được flag. Chú ý nếu nhận được fake flag hãy thực hiện `Rollback` và thực hiện khai thác lại nhé.
 
 Flag: `CHH{BE_cAr3fUL_WitH_NE6ATIV3_NumBeR_d0b21424951572b39362d8414c0fb18b}`
@@ -788,6 +799,7 @@ Mình mở file đó lên trong window nhưng lại không mở được.
 Theo hướng dẫn trên google thì phải đưa file này vào thư mục: `C:\Users\<UserName>\AppData\Roaming\Microsoft\Word` mới mở được.
 
 oh. I got it 💯
+
 ![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/f22ed90f-c7b6-4d89-b1dd-6b0d34522725)
 
 😄 mình có flag và đề cương báo cáo của anh Long. 😄
