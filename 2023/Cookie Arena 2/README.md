@@ -750,17 +750,44 @@ Format Flag: CHH{XXX}
 Mình được cung cấp file như sau:
 ![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/3d356452-6ae7-45e7-b44f-ced1f7b73400)
 
-Tìm hiểu một chút thì đây là một file crash dump trong hệ thống 
+Tìm hiểu một chút thì đây là một file crash dump trong hệ thống. Bản sao bộ nhớ chết cung cấp thông tin chi tiết về trạng thái hệ thống tại thời điểm lỗi xảy ra. Nó bao gồm thông tin về quá trình, luồng, bộ nhớ và các tài nguyên hệ thống khác. Khi xảy ra một sự cố nghiêm trọng như một lỗi máy chủ (BSOD), việc phân tích file MEMORY.DMP có thể giúp các nhà phát triển và kỹ thuật viên xác định nguyên nhân và khắc phục lỗi.
+
+Mình sẽ sử dụng công cụ `volatility` để phân tích file này.
+Chạy các lệnh sau trong thư mục chứa file MEMORY.DMP để sử dụng `volatility`
+```
+docker pull phocean/volatility
+docker run --rm --user=$(id -u):$(id -g) -v "$(pwd)":/dumps:ro,Z -ti phocean/volatility -f /dumps/dump.vmem imageinfo
+```
 
 ### Solution
+Xem thông tin `pslist`
 
-### Solution
-Trước hết mình cần biết profile. Mình sử dụng option `imageinfo`
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/ebda1bf6-8cac-4a75-85f8-ec79916c96e3)
 
-![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/f6cb78b6-7764-4387-9552-f9936886debb)
+bài này mình hơi bí. Đọc kỹ gợi ý, Hòa đang làm bài tập máy bị tắt đột ngột. Có vẻ Hòa đnag sử dụng file doc.
 
-Hể chả có gì cả. Sau một hồi google thì mình thấy 
+Tìm google xem word có cơ chế sao lưu dữ liệu ở đâu không trên mạng thì tìm thấy một số blog sau hữu ích.
+https://versitas.com/computer-crashed-can-get-word-doc-back
 
+https://learn.microsoft.com/en-us/office/troubleshoot/word/recover-lost-unsaved-corrupted-document
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/4a3ef9fa-f41d-4e88-9bd0-3379e32bcd1e)
 
+Bây giờ, ý tưởng cần tìm xem có file AutoRecover được lưu lại không.
 
+Mình chạy lệnh sau:
+`sudo docker run --rm --user=$(id -u):$(id -g) -v "$(pwd)":/dumps:ro,Z -ti phocean/volatility -f /dumps/MEMORY.DMP --profile=Win7SP1x64 filescan`
 
+Có rất nhiều file được tìm thấy, bao gồm cả file mình cần tìm.
+
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/ceb8fa1d-c1ed-4617-9d2e-f84e44cd2326)
+
+Dump file đó ra 🫀:
+`sudo docker run --rm --user=$(id -u):$(id -g) -v "$(pwd)":/dumps:ro,Z -ti phocean/volatility -f /dumps/MEMORY.DMP --profile=Win7SP1x64 dumpfiles -Q 0x000000007e3e2070 -D .
+`
+Mình mở file đó lên trong window nhưng lại không mở được.
+Theo hướng dẫn trên google thì phải đưa file này vào thư mục: `C:\Users\<UserName>\AppData\Roaming\Microsoft\Word` mới mở được.
+
+oh. I got it 💯
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/f22ed90f-c7b6-4d89-b1dd-6b0d34522725)
+
+😄 mình có flag và đề cương báo cáo của anh Long. 😄
