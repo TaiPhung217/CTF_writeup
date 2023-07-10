@@ -316,14 +316,219 @@ Setup Intruder burpsuite như sau:
 ![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/0c35f184-0158-48a3-adc8-31dcbb2f61ea)
 
 
+## Youtube Downloader
+### Mô tả
+```
+Youtube Downloader là công cụ giúp bạn tải video từ Youtube về máy tính miễn phí. Nếu hack được ứng dụng này, bạn sẽ nắm trong tay công nghệ tải video của các website Youtube Downloader trên thế giới.
+```
+Container link: https://youtube-downloader-9c0ee246.dailycookie.cloud
+
+### Phân tích
+Giao diện web được cung cấp như sau
+
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/1f8cd61e-208e-41eb-9ad7-07e1965d4fc5)
+Có một chức năng đơn giản là nhận đầu vào là một url video của youtube và hiển thị ảnh thumbnail lên màn hình.
+Đầu vào cho phép phải là một url
+
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/093e88b8-d1f6-4092-924f-94c34dcf8cbd)
+
+Cho những ai chưa biết thì. thumbnail là hình ảnh thu nhỏ được sử dụng để đại diện cho một video trên internet, đặc biệt xuất hiện nhiều trong các nền tảng chia sẻ video như Youtube, Facebook và Instagram. Thường được hiển thị bên cạnh tiêu đều và mô tả video để thu hút sự chú ý của người xem và tạo ấn tượng 👽
+
+Ví dụ mình thử nhập một liên kết như sau:
+
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/5bf1bbbf-2cf4-479c-b86f-77a7968631e4)
+Ứng dụng hiển thị thumbnail cùng với lệnh thực thi lên màn hình.
 
 
+### Solution
+Vì mình đã từng làm một số thử thách liên quan tới công cụ youtube-dl rồi nền mình biết trong công cụ này có một số chức năng có thể dẫn tới `Chèn lệnh thực thi`.  🚡 Nhưng mình sẽ trình bày lại từ đầu như dưới đây.
 
+Để ý dòng lệnh thực thi.
+```bash
+youtube-dl --get-thumbnail https://www.youtube.com/watch?v=ZRtdQ81jPUQ
+```
+Có thể thấy url được lấy từ đầu vào của người dùng được truyền trực tiếp vào lệnh thực thi của công cụ youtube-dl
+Google một chút bạn có thể tìm thấy source code của công cụ này trên github.
 
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/7a03e28d-e243-4db5-9f16-50a24ceb8994)
+wow. 🥈 Đây là một công cụ viết bằng Python để tải xuống video từ Youtube và hơn thế nữa và được chạy trên máy mục tiêu. Vì là một công cụ mã nguồn mở nên từ mã nguồn ta có thể tìm kiếm điểm yếu.
 
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/8050a2d1-93f3-40bb-a76f-fb3c0cdbe71a)
+Một số Options cơ bản của công cụ này:
 
+Trước tiên mình muốn xác định vị trí mà kết quả server sẽ phản hồi về. Mình sẽ thử chèn `--version` phía sau url để xem có số phiên bản phản hồi về không.
+Bước này mình không biết sao server rất hay phản hồi sai. Nhưng có vẻ như ký tự `space` dẫn tới lệnh bị thực thi sai. Ta không thể sử dụng `%20` được. Vì vậy mình sẽ sử dụng `%09` đại diện cho một ký tự tab để thay cho khoảng trắng. Bạn cũng thể sử dụng `${IFS}` cũng được.
+Payload: `https://www.youtube.com/watch?v=y_-1uiB2T9Y%09--version`
 
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/2d8ce9e4-2c11-4ce4-a841-c666ffd8ee10)
+Và thành công lấy được phiên bản của `youtube-dl`. Kết quả sau khi được thực thi được chuyển hướng tới đó. 
 
+Hmmm. Vậy là ta đã có thể chứng minh rằng youtube-dl này không an toàn và có thể bị broken. Mình tiếp tục đọc doc của công cụ thì mình tìm thấy một Options thú vị.
 
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/351fb205-73c7-44d6-8d6f-8d0d8a3d5783)
 
+Hay ghê. Công cụ này còn có cả chức năng thực thi lệnh lên file sau khi được tải xuông. Đến đây thì mình sẽ thay vì sử dụng `--version` mình thay bằng `--exec` và truyền vào lệnh mong muốn.
 
+Payload: `https://www.youtube.com/watch?v=y_-1uiB2T9Y%09--exec%09'id'`
+Rất lạ là tại sao lại không thành công🧮 !!!!
+Nó cứ xuất hiện cái màn hình này.
+
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/9ccbde31-88bc-49b4-8415-cba38ae61bdb)
+
+Vì vậy mình quyết định thay đổi chút chiến thuật. Không sử dụng Options nữa (chắc bị bypass). Vì mình có thể thoải mái chèn command vào phía sau url nên tại sao ta không ngắt dòng để tạo một command mới. Kỹ thuật này rất hay, mình áp dụng nó rất nhiều.
+Sử dụng `%0a` để ngắt dòng nhé. Hoặc bạn sử dụng burp bà chèn thêm ký tự `\n` vào vị trí muốn ngắt. Ngoài 
+Payload: `https://www.youtube.com/watch?v=y_-1uiB2T9Y%09%0acat</flag.txt`
+
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/e2dd43fb-4eaa-4c6e-86de-832f7f4439e1)
+Kết quả đọc tệp `flag.txt` thành công.
+Flag: CHH{Ea5y_cOmmaND_inj3c7Ion_****************************}
+
+Bạn có thể luyện tập một challenge tương tự như này tại đây: https://savassaygili.com/tryhackme-convertmyvideo
+
+## Pass Code
+### Mô tả
+```
+Bạn không thể bẻ khoá Pass Code cực an toàn này.
+```
+Container link: http://pass-code-02604060.dailycookie.cloud
+
+### Phân tích và solution
+Giao diện được cung cấp trông như sau:
+
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/c3f91d5f-5fc5-47a3-8949-539407f0e5ef)
+
+Trong nút `FLAG` yêu cầu nhập một decrypt key để nhận được cờ
+
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/f7a50176-9249-4b70-bf3b-b4033ad9ecfe)
+
+Tại đây, Mình nghĩ ứng dụng web sử dụng cách gì để kiểm tra key chính xác và mình đã bắt tay tìm kiếm mã nguồn sót lại và tìm thấy file sau. `http://pass-code-02604060.dailycookie.cloud/crypto-js.js`
+
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/2181a54c-66e8-4e63-a319-8889b1c10399)
+Ồ nó chỉ là mã nguồn của thư viện CryptoJS 🎱
+
+Ngoài ra, view-source cũng có một đoạn script trông rất khó nhìn.
+```js
+function _0x50c7(_0x3bf473,_0xe70ef2){var _0xae3a1a=_0x55ef();return _0x50c7=function(_0x5b97f1,_0x5b0043){_0x5b97f1=_0x5b97f1-(0x1ded+0x1*-0x1003+0x45f*-0x3);var _0x5cb926=_0xae3a1a[_0x5b97f1];if(_0x50c7['dmaofR']===undefined){var _0x2e7309=function(_0x1f6fec){var _0x105c14='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/=';var _0x31489e='',_0xa27067='',_0x58f736=_0x31489e+_0x2e7309;for(var _0x25fbe9=0x2*-0x9c5+0x116*0xb+0x288*0x3,_0x411748,_0x93f4cc,_0x62f6af=0x7*-0x11b+0x26d*0xb+-0x12f2;_0x93f4cc=_0x1f6fec['charAt'](_0x62f6af++);~_0x93f4cc&&(_0x411748=_0x25fbe9%(-0x12aa*-0x1+0x1f9d+-0x3243)?_0x411748*(0x1cc6*-0x1+-0xa5a+-0xe0*-0x2d)+_0x93f4cc:_0x93f4cc,_0x25fbe9++%(0x1*0x14e7+0xab9+-0x1f9c))?_0x31489e+=_0x58f736['charCodeAt'](_0x62f6af+(-0xed0+0x1195+0x2bb*-0x1))-(0x4*-0x655+-0x207a+0x4d2*0xc)!==-0x1*0xc5b+-0x1*0x248e+0x1*0x30e9?String['fromCharCode'](-0x1*-0x2605+-0x1bab+-0x5*0x1df&_0x411748>>(-(-0x98*0x6+-0x666+-0x27e*-0x4)*_0x25fbe9&0x1720+0x1*-0x1dd2+-0xa*-0xac)):_0x25fbe9:0x716*-0x2+-0x20*-0x16+0xb6c){_0x93f4cc=_0x105c14['indexOf'](_0x93f4cc);}for(var _0x9bedcb=0x513*0x5+0x8*-0x301+0x1*-0x157,_0x327cd1=_0x31489e['length'];_0x9bedcb<_0x327cd1;_0x9bedcb++){_0xa27067+='%'+('00'+_0x31489e['charCodeAt'](_0x9bedcb)['toString'](-0x4*-0x485+-0x593*-0x1+-0x9*0x29f))['slice'](-(-0xe86+0x59*0x1+0xe2f));}return decodeURIComponent(_0xa27067);};_0x50c7['wDBSLi']=_0x2e7309,_0x3bf473=arguments,_0x50c7['dmaofR']=!![];}var _0x200d55=_0xae3a1a[-0x2026+-0x26f0+0x4716],_0xe0e0b3=_0x5b97f1+_0x200d55,_0x4d5ea0=_0x3bf473[_0xe0e0b3];if(!_0x4d5ea0){var _0x49c6d4=function(_0x461dd6){this['DytWPB']=_0x461dd6,this['YhilVC']=[-0x3*-0x563+0x1537*-0x1+-0x5*-0x103,-0x53f*0x1+0xc65+-0x726,-0x1*-0x1ae3+-0xaca*0x3+0x57b],this['kTMFMM']=function(){return'newState';},this['nlZNXH']='\x5cw+\x20*\x5c(\x5c)\x20*{\x5cw+\x20*',this['nDTZzB']='[\x27|\x22].+[\x27|\x22];?\x20*}';};_0x49c6d4['prototype']['uyeFQe']=function(){var _0xd6c0a6=new RegExp(this['nlZNXH']+this['nDTZzB']),_0x42fe77=_0xd6c0a6['test'](this['kTMFMM']['toString']())?--this['YhilVC'][-0xc4b+-0x3d*0x1+-0xc89*-0x1]:--this['YhilVC'][-0x2593+0x1d26*0x1+0x86d];return this['hfzizQ'](_0x42fe77);},_0x49c6d4['prototype']['hfzizQ']=function(_0x321c3e){if(!Boolean(~_0x321c3e))return _0x321c3e;return this['pQDVJK'](this['DytWPB']);},_0x49c6d4['prototype']['pQDVJK']=function(_0x491597){for(var _0x290b41=0xf6*-0xa+-0x2464+0x2e00,_0xb34cfb=this['YhilVC']['length'];_0x290b41<_0xb34cfb;_0x290b41++){this['YhilVC']['push'](Math['round'](Math['random']())),_0xb34cfb=this['YhilVC']['length'];}return _0x491597(this['YhilVC'][0x2d*0x5+-0x1*0x137b+-0x2*-0x94d]);},new _0x49c6d4(_0x50c7)['uyeFQe'](),_0x5cb926=_0x50c7['wDBSLi'](_0x5cb926),_0x3bf473[_0xe0e0b3]=_0x5cb926;}else _0x5cb926=_0x4d5ea0;return _0x5cb926;},_0x50c7(_0x3bf473,_0xe70ef2);}function _0x55ef(){var _0x4385a8=['Aog6Pw0GC+g7R2e','zw5J','kcGOlISPkYKRkq','zM9YrwfJAa','mti4nZK4AMvfBefN','quvt','CMvTB3zLqxr0CG','mJqXmZq2oeLMwxrjsq','mteXmtuXv0j1zMXp','zgvJCNLWDa','y29UC3rYDwn0BW','z2v0qxr0CMLIDq','ugDTsue','v3vkzMq','tw5hAgy','DhnTEMe','mJfksNrhAKK','nZq3nJy0AKTRyxDT','EMfhzLi','zvvVr2C','BwfW','C2vHCMnO','Agr0Eei','vhDkwMW','zNjVBq','CxvLCNLtzwXLyW','ySoHBMGGCxv5igm','Dg9YqwXS','mta4mdC2mdvgB0fyCMu','sfz0yNK','we5zyxa','i2nOyxb0zxiTyW','mJe4mZuZogryvw9tBa','B250zw50igLTzW','vxrMoa','yZaWA2LLlwfYmW','yxbWBhK','nK1JEujJAW','Dg9tDhjPBMC','mJuXmdm0nuPYywr0DW','re1erhq','Awj1Dgu','DM1lr1a','zw5JCNLWDgvKlq'];_0x55ef=function(){return _0x4385a8;};return _0x55ef();}(function(_0x131f4f,_0x5e75ae){function _0x14ec9f(_0x22aa9e,_0x24c5e8,_0x423d74,_0x578c69){return _0x50c7(_0x24c5e8-0x83,_0x578c69);}function _0x3aac89(_0x230c75,_0x4d3f9b,_0x3d0dd7,_0x285ab9){return _0x50c7(_0x4d3f9b- -0x1a3,_0x3d0dd7);}var _0xbb3638=_0x131f4f();while(!![]){try{var _0x3c07e5=-parseInt(_0x14ec9f(0x163,0x165,0x174,0x160))/(0x2196+-0x1189*-0x1+-0x331e)+parseInt(_0x3aac89(-0xbc,-0xc5,-0xc3,-0xbf))/(0x176d+-0x97e+-0xded)*(-parseInt(_0x14ec9f(0x15b,0x16d,0x159,0x15b))/(0x1d*-0xb5+0x372*-0x7+0x2ca2))+parseInt(_0x3aac89(-0xae,-0xc2,-0xbf,-0xb9))/(-0x1*-0x246e+0x614+-0xde*0x31)+-parseInt(_0x14ec9f(0x146,0x158,0x162,0x152))/(0x1758+0xdf*0x25+-0x1*0x378e)+-parseInt(_0x14ec9f(0x14d,0x156,0x166,0x15d))/(0x1bce+0x1c3*0xf+-0x3635)*(parseInt(_0x14ec9f(0x14b,0x151,0x15e,0x147))/(-0x17ef+-0xe*-0x1b6+0x2))+-parseInt(_0x3aac89(-0xb1,-0xb8,-0xb2,-0xce))/(-0x3*0x756+-0x2213+0xb39*0x5)+parseInt(_0x14ec9f(0x18f,0x179,0x175,0x175))/(-0x1fca+-0xe1d+0x310*0xf);if(_0x3c07e5===_0x5e75ae)break;else _0xbb3638['push'](_0xbb3638['shift']());}catch(_0x436618){_0xbb3638['push'](_0xbb3638['shift']());}}}(_0x55ef,-0x97168+0x14106+0x105dd*0xd),async function main(){var _0x890fcf={'MnGhf':_0x56ba08(0x357,0x34d,0x345,0x353),'WuJfd':_0x56ba08(0x34d,0x33e,0x342,0x34a)+'+$','XIkzW':function(_0x3f3c95,_0x29649d){return _0x3f3c95===_0x29649d;},'hdtxB':'UQELD','HVtby':_0x56ba08(0x347,0x340,0x358,0x333),'Gmpce':function(_0x4b892e,_0x461dc0){return _0x4b892e||_0x461dc0;},'vmKGP':_0xea2690(0x414,0x409,0x412,0x40e)+'na-ctf','PNJnP':function(_0xa63c9e,_0x27bbdf,_0x447c17){return _0xa63c9e(_0x27bbdf,_0x447c17);},'tsmza':function(_0x49096e){return _0x49096e();},'XNYap':_0xea2690(0x41b,0x420,0x415,0x40a)+_0xea2690(0x40b,0x400,0x409,0x40c)};function _0x56ba08(_0x3befa3,_0x4e1ffd,_0x21938f,_0x7fec01){return _0x50c7(_0x3befa3-0x271,_0x7fec01);}var _0x24b3ab=(function(){var _0x4f136a={};_0x4f136a[_0x40d327(0x3e6,0x3cd,0x3d7,0x3e8)]=function(_0x23d217,_0x1f8a53){return _0x23d217===_0x1f8a53;};function _0x40d327(_0x1196ca,_0x23db5a,_0x45c200,_0x5628e5){return _0xea2690(_0x23db5a,_0x23db5a-0x93,_0x45c200-0x2c,_0x45c200- -0x53);}_0x4f136a['zaGfR']=_0x890fcf[_0x40d327(0x3cb,0x3cf,0x3d2,0x3e4)];function _0x346564(_0x2de998,_0x3be0c5,_0x38e73c,_0x396547){return _0x56ba08(_0x3be0c5- -0x5a1,_0x3be0c5-0x10b,_0x38e73c-0x1,_0x38e73c);}_0x4f136a['TwJZl']='KrqBM';var _0x951797=_0x4f136a,_0x140877=!![];return function(_0x36bc46,_0x3c9734){function _0x1fc640(_0x1f0d5e,_0x1228ed,_0x1fd042,_0x5dd4ec){return _0x346564(_0x1f0d5e-0x8f,_0x5dd4ec-0x5e,_0x1228ed,_0x5dd4ec-0x14c);}function _0x29cafd(_0x33836c,_0x3d7506,_0x3165d1,_0x4ce102){return _0x40d327(_0x33836c-0x1d,_0x3d7506,_0x33836c- -0x105,_0x4ce102-0xf6);}if(_0x951797['eUoGg'](_0x951797[_0x1fc640(-0x1d5,-0x1d0,-0x1df,-0x1e6)],_0x951797[_0x29cafd(0x2d6,0x2c5,0x2df,0x2cf)])){var _0x33e487=_0x46e645['apply'](_0x47201f,arguments);return _0x2b5775=null,_0x33e487;}else{var _0x54cdd4=_0x140877?function(){function _0x1e785(_0x510980,_0x3d2d47,_0x5bf169,_0x37623){return _0x1fc640(_0x510980-0x174,_0x37623,_0x5bf169-0x3f,_0x5bf169-0x5c9);}if(_0x3c9734){var _0x505e3b=_0x3c9734[_0x1e785(0x3d1,0x3b6,0x3c9,0x3d1)](_0x36bc46,arguments);return _0x3c9734=null,_0x505e3b;}}:function(){};return _0x140877=![],_0x54cdd4;}};}()),_0x34b2c2=_0x890fcf['PNJnP'](_0x24b3ab,this,function(){function _0x590bcc(_0x512482,_0x7ce841,_0x4ca8c5,_0x203b62){return _0x56ba08(_0x7ce841- -0x328,_0x7ce841-0x1b3,_0x4ca8c5-0x14a,_0x4ca8c5);}function _0x89be1a(_0x13c474,_0x5864d5,_0x5acfe7,_0x3cdda4){return _0x56ba08(_0x3cdda4- -0x45a,_0x5864d5-0x85,_0x5acfe7-0x1f1,_0x13c474);}return _0x34b2c2[_0x590bcc(0x16,0x1d,0x13,0x18)]()['search'](_0x890fcf['WuJfd'])[_0x89be1a(-0x103,-0x115,-0xff,-0x115)]()[_0x590bcc(0x28,0x2d,0x33,0x1b)+'r'](_0x34b2c2)[_0x89be1a(-0x10d,-0x10c,-0xf0,-0xfa)](_0x890fcf[_0x590bcc(0x43,0x30,0x24,0x25)]);});_0x890fcf[_0xea2690(0x420,0x413,0x415,0x426)](_0x34b2c2);function _0x2e3fc4(_0x230fda,_0x10a57a){function _0x2b814b(_0x403f5b,_0x2eb703,_0x59f60d,_0x4dfb88){return _0xea2690(_0x4dfb88,_0x2eb703-0x92,_0x59f60d-0xfc,_0x59f60d- -0x1da);}function _0x24ebc4(_0x4530cb,_0x558a82,_0x4da7f7,_0x269984){return _0xea2690(_0x269984,_0x558a82-0x6,_0x4da7f7-0x1d0,_0x4da7f7- -0xa1);}if(_0x890fcf['XIkzW'](_0x890fcf[_0x24ebc4(0x39e,0x396,0x38c,0x381)],_0x890fcf[_0x2b814b(0x26f,0x24d,0x25a,0x25e)])){var _0x2c3e6f=_0x4004c5?function(){function _0x2c809c(_0xd50cea,_0x2ec578,_0x2f0769,_0x12fe45){return _0x24ebc4(_0xd50cea-0x1bc,_0x2ec578-0x134,_0x2f0769- -0x3a3,_0x2ec578);}if(_0x23acf2){var _0x3e799f=_0x230dff[_0x2c809c(-0x42,-0x24,-0x35,-0x2e)](_0x4f44af,arguments);return _0x597eff=null,_0x3e799f;}}:function(){};return _0x3eebc4=![],_0x2c3e6f;}else{var _0x3c12b2=CryptoJS[_0x24ebc4(0x373,0x364,0x377,0x389)]['Utf8']['parse'](_0x890fcf['Gmpce'](_0x10a57a,_0x890fcf[_0x24ebc4(0x37e,0x37e,0x374,0x375)])),_0x329fea=CryptoJS['AES'][_0x2b814b(0x235,0x257,0x246,0x243)](_0x230fda,_0x3c12b2,{'iv':_0x3c12b2});return _0x329fea[_0x2b814b(0x228,0x248,0x237,0x224)](CryptoJS[_0x24ebc4(0x365,0x37a,0x377,0x37d)][_0x24ebc4(0x37e,0x376,0x36c,0x368)]);}}const _0x5f2a9b=_0x890fcf[_0xea2690(0x427,0x423,0x425,0x435)];var _0x5df765=document[_0xea2690(0x42f,0x42f,0x422,0x430)+_0x56ba08(0x366,0x376,0x37a,0x36b)](_0x5f2a9b);_0x5df765=Array[_0xea2690(0x436,0x426,0x444,0x42f)](_0x5df765);var _0x46d3cf=_0x5df765[_0xea2690(0x42e,0x421,0x419,0x42b)](_0x2ffa3f=>_0x2ffa3f[_0x56ba08(0x356,0x36b,0x344,0x35a)+'te'](_0xea2690(0x425,0x428,0x401,0x416)+'src'));_0x46d3cf=_0x46d3cf[_0xea2690(0x433,0x43d,0x42e,0x42b)](_0x294fdc=>CryptoJS[_0xea2690(0x410,0x414,0x407,0x41c)][_0xea2690(0x42c,0x410,0x41b,0x420)](_0x294fdc,_0x56ba08(0x365,0x35e,0x353,0x354)+_0x56ba08(0x34b,0x34d,0x352,0x361))['toString'](CryptoJS[_0x56ba08(0x34c,0x357,0x336,0x336)]['Utf8']));function _0xea2690(_0xee59d9,_0x4e2848,_0x3a758b,_0x42c81e){return _0x50c7(_0x42c81e-0x33d,_0xee59d9);}_0x5df765[_0x56ba08(0x34e,0x33b,0x352,0x346)]((_0x3ae067,_0x18596f)=>(_0x3ae067[_0xea2690(0x427,0x414,0x40f,0x41d)+_0x56ba08(0x348,0x341,0x35d,0x34e)](_0xea2690(0x406,0x40d,0x409,0x416)+'src'),_0x3ae067['setAttribu'+'te']('src',_0x46d3cf[_0x18596f])));}());
+```
+Đoạn mã này là Javascript đã bị obfuscated. Công cụ có thể deobfuscate có rất nhiều  bạn có thể google nhé. Mình sau khi deofuscated thì được đoạn mã ngắn gọn và dễ nhìn hơn sau: ⚓
+```js
+;(async function main() {
+  var _0x24b3ab = (function () {
+      var _0x140877 = true
+      return function (_0x36bc46, _0x3c9734) {
+        var _0x54cdd4 = _0x140877
+          ? function () {
+              if (_0x3c9734) {
+                var _0x505e3b = _0x3c9734.apply(_0x36bc46, arguments)
+                return (_0x3c9734 = null), _0x505e3b
+              }
+            }
+          : function () {}
+        return (_0x140877 = false), _0x54cdd4
+      }
+    })(),
+    _0x34b2c2 = _0x24b3ab(this, function () {
+      return _0x34b2c2
+        .toString()
+        .search('(((.+)+)+)+$')
+        .toString()
+        .constructor(_0x34b2c2)
+        .search('(((.+)+)+)+$')
+    })
+  _0x34b2c2()
+  function _0x2e3fc4(_0x230fda, _0x10a57a) {
+    var _0x3c12b2 = CryptoJS.enc.Utf8.parse(_0x10a57a || 'c00kie-ar3na-ctf'),
+      _0x329fea = CryptoJS.AES.decrypt(_0x230fda, _0x3c12b2, { iv: _0x3c12b2 })
+    return _0x329fea.toString(CryptoJS.enc.Utf8)
+  }
+  const _0x5f2a9b = '#chapter-content img'
+  var _0x5df765 = document.querySelectorAll(_0x5f2a9b)
+  _0x5df765 = Array.from(_0x5df765)
+  var _0x46d3cf = _0x5df765.map((_0x2ffa3f) =>
+    _0x2ffa3f.getAttribute('encrypted-src')
+  )
+  _0x46d3cf = _0x46d3cf.map((_0x294fdc) =>
+    CryptoJS.AES.decrypt(_0x294fdc, 'bánh quy chấm sữa').toString(
+      CryptoJS.enc.Utf8
+    )
+  )
+  _0x5df765.forEach(
+    (_0x3ae067, _0x18596f) => (
+      _0x3ae067.removeAttribute('encrypted-src'),
+      _0x3ae067.setAttribute('src', _0x46d3cf[_0x18596f])
+    )
+  )
+})()
+```
+
+Chức năng chính của đoạn mã trên như sau:
+* Mình tập trung vào hàm Crypto `_0x2e3fc4` hàm này nhận hai đối số `_0x230fda` và `_0x10a57a`. Và thực hiện chức năng giải mã bằng thuật toadn AES và khóa `_0x10a57` nếu không được cung cấp sẽ sử dụng khóa mặc định là `c00kie-ar3na-ctf`. Kết qảu được trả về ở dạng chuỗi UTF-8 nhé. 🐤
+* Sau đó, đoạn mã tiếp tục bằng việc chọn tất cả các phần tử `<img>` trong document hiện tại với `#chapter-content img`
+* Tiếp theo, lấy giá trị trong thuộc tính `source-src` của mỗi ảnh và thực hiện giải mã AES với khóa là `bánh quy chấm sữa` 🍪
+  
+  ![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/e3e387f4-a5b8-4282-834e-d86b876c4a4d)
+
+  Mình có mô phỏng lại cách làm việc này bằng công cụ online sau:
+  
+  ![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/d5aeef6a-630e-47a7-bdaa-4748d125975d)
+  Ồ hóa ra đó là đường dẫn tới file ảnh đó trong server. `bánh quy chấm sữa` là decrypt key mà ta cần tìm.
+
+Đến đây thì mình thấy, chall có thể phát triển thêm để hay hơn. Nhưng chỉ cần put decrypt key là `bánh quy chấm sữa` vào `FLAG` là ta sẽ lấy được lá cờ.
+
+Flag: `CHH{jAvAscRIP7_o8FuSCaTe_70326fd1bd98e39c43dc97faac2a594f}`
+
+## Be Positive
+### Mô tả
+```
+Libra Dnuf Marketplace
+
+Libra Dnuf is known underground as a marketplace to sell sensitive information and lost secrets. This place has long closed registration but only allows reputable members to exchange items. During a reconnaissance, 0x1115 team caught the exchange of two members codenamed alice and bob.
+
+After analyzing the packets, 0x1115 was able to decrypt the passwords for alice and bob that matched the usernames. With this loophole, the analysis team continues to detect the Transfer Function between users after passing the authentication portal.
+
+To avoid wake a sleeping dog, 0x1115 quickly took a snapshot of Libra Dnuf market and transferred it to CookieArena for investigation to find the important file in the flag package. We also recommend to be careful with the rollback option, because using this function all data will be reset to its original state.
+
+Format Flag: CHH{XXX} Nếu xuất hiện Fake Flag hãy nhấn nút Rollback trong Challenge và thực hiện test lại.
+```
+
+### Phân tích
+* Giao diện được cung cấp khá đơn giản. 🥠
+
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/c3f6f2be-3786-4f12-a406-84391b9ba95b)
+
+Cơ bản thì chall cung cấp cho chúng ta 2 tài khoản: 
+Account `alice` có password `alice`.
+Account `bob` có password `bob`.
+
+* Giao diện sau khi đăng nhập
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/e174d360-6168-4b9f-97a4-6c50730b85c8)
+
+ - Chức năng `Market`: hiển thị danh sách các vậy có thể mua, bao gồm cả flag và cả số dư liệu tại. Đây là một chall FLAG Shop 🈲
+ - Chức năng: `Tranfer`: cho phép chuyển tiền giữa các tài khoản.
+   
+   ![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/d6a03ed3-69d8-4cfe-ab24-301850a9f59a)
+- Chức năng `Rollback`: dùng để reset lại challenge.
+
+Chúng ta cần có 3001$ để mua flag. Trong khi tài khoản chỉ `alice` và cả `bob` chỉ có tổng cộng 3000$. Hmmmm . 
+Sau khi rà hết những lỗ hổng có khả năng như `cmdi và sqli` mình không nhận được kết quả khả thi nào cả.
+Đa số dạng đề này Ý tưởng là làm sao bypass được chức năng `Tranfer` làm thay đổi số dư hiện tại. 
+
+Đây là một giao dịch thành công.
+
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/5c030f43-a600-4872-b4f2-a46e0d1cf218)
+
+### Solution
+Tưởng tượng cách làm việc của hàm `Tranfer` như sau:
+nó sẽ lấy số dư hiện tại trừ cho giá trị `amount` để cập nhật số dư. Vậy nế nếu `amount` là một giá trị âm thì sao. Khi đó phép tính trừ sẽ chuyển thành cộng làm tăng số dư.
+
+Điều này tạo ra một giao dịch thành công.
+
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/1c6e9343-4db8-4b6d-affd-dbec17ee32fd)
+
+Kiểm tra số dư trong tài khoản của `alice` mình thấy số dư đã được tăng lên thành công. 🚡
+
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/63727f5d-80df-4fb0-980d-dddc03c824a9)
+
+Mua flag và mình nhận được flag. Chú ý nếu nhận được fake flag hãy thực hiện `Rollback` và thực hiện khai thác lại nhé.
+
+Flag: `CHH{BE_cAr3fUL_WitH_NE6ATIV3_NumBeR_d0b21424951572b39362d8414c0fb18b}`
