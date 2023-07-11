@@ -601,10 +601,100 @@ Mua flag và mình nhận được flag. Chú ý nếu nhận được fake flag
 
 Flag: `CHH{BE_cAr3fUL_WitH_NE6ATIV3_NumBeR_d0b21424951572b39362d8414c0fb18b}`
 
+## Slow Down
+## Mô tả 
+```
+Libra Dnuf Marketplace
+
+Libra Dnuf is known underground as a marketplace to sell sensitive information and lost secrets. This place has long closed registration but only allows reputable members to exchange items. During a reconnaissance, 0x1115 team caught the exchange of two members codenamed alice and bob.
+
+After analyzing the packets, 0x1115 was able to decrypt the passwords for alice and bob that matched the usernames. With this loophole, the analysis team continues to detect the Transfer Function between users after passing the authentication portal.
+
+To avoid wake a sleeping dog, 0x1115 quickly took a snapshot of Libra Dnuf market and transferred it to CookieArena for investigation to find the important file in the flag package. We also recommend to be careful with the rollback option, because using this function all data will be reset to its original state.
+
+Format Flag: CHH{XXX} Nếu xuất hiện Fake Flag hãy nhấn nút Rollback trong Challenge và thực hiện test lại.
+```
+
+## Phân tích
+Bài này tương tự bài `Be Positive` nhưng giờ không thể chèn thêm số âm được nữa. 
+Do tên bài là `Slow down` nền mình nhớ tới một số chall trước đây từng làm. Là phải gửi 2 yêu cầu cùng một lúc để thay đổi số dư.
+
+Tuy nhiên mình thử rất nhiều lúc thì lại không thấy thành công.Mình thấy rằng trong lúc Tranfer quá trình xử lý thực hiện rất chậm. Điều này rất có thể gây ra lỗi . Lợi dụng việc thực thi chậm đó mình có thể gửi tiếp một request tương tự
+
+## Solution
+Gửi 2 request với 2 phiên khác nhau cùng một lúc. 
+
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/6791955a-48e3-4c93-9266-e4314e47ee1f)
+
+Kết quả thành công. mặc dùng chỉ có 1500$ nhưng mình có thể gửi 2 lần 1000$
+
+Flag: `CHH{ea5y_RaCe_CONd17iOn_2b98b4a7e82f628643349ed709436f94}`
+
+
+## Suck it
+Bài này trong giải mình không làm được 🥦
+### Mô tả
+```
+Bạn thâm nhập được vào kênh chat của tổ chức bí mật. Lão admin của kênh chat này rất xấu xa. Hắn buôn lậu vũ khí và đẩy bà già xuống biển. Tuy nhiên, hắn luôn nói bí mật cho người yêu. Hãy giúp tôi tìm ra bí mật đó. Tôi sẽ hổ trợ bạn source của trang web này.
+
+Download challenge: https://drive.google.com/file/d/17LcN4BLMjSyWfT7BofysYjMio4OY2EdO/view?usp=drive_link (pass: cookiehanhoan)
+
+FLAG Format: CHH{XXX}
+```
+
+### Phân tích
+Bài này ta chú ý ở đoạn code này
+```
+  // admin force any user to disconnect
+  socket.on("force disconnect",async (userID,secretKey)=>{
+    // check valid account
+    if (secretKey !== "574a94b04f303f5663e833b883cd2b23"){
+      socket.emit("This secret key is wrong.")
+    }
+    else{
+    const targetSocket = await sessionStore.findSessionsByUserID(userID);
+    const matchingSockets = await io.in(targetSocket.userID).allSockets();
+    const isDisconnected = matchingSockets.size === 0;
+    if (isDisconnected) {
+      // notify other users
+      socket.broadcast.emit("user disconnected", targetSocket.userID);
+      // update the connection status of the session
+      socket.emit(targetSocket.sessionID);
+      sessionStore.saveSession(targetSocket.sessionID, {
+        userID: targetSocket.userID,
+        username:targetSocket.username,
+        connected: false,
+      });
+    }};
+  });
+```
+Giải thích:
+* `if (secretKey !== "574a94b04f303f5663e833b883cd2b23") {` kiểm tra xem secretKey có khớp với giá trị đã cho hay không. Nếu không khớp, một thông báo lỗi sẽ được gửi lại cho admin thông qua socket.emit
+* `const targetSocket = await sessionStore.findSessionsByUserID(userID);` tìm kiếm thông tin phiên (session) của người dùng dựa trên userID. Đây giả định rằng hệ thống đã có một cơ chế lưu trữ phiên (session) và hàm findSessionsByUserID được sử dụng để tìm kiếm phiên của người dùng dựa trên ID.
+* `socket.broadcast.emit("user disconnected", targetSocket.userID);` thông báo cho tất cả người dùng khác rằng người dùng đã bị ngắt kết nối thông qua sự kiện "user disconnected". Điều này cho phép cập nhật giao diện người dùng của các thành viên khác.
+* `socket.emit(targetSocket.sessionID);` thông báo cho socket của admin về sessionID của người dùng bị ngắt kết nối. Chi tiết về việc thông báo này được xử lý bên phía client.
+
+### Solution
+Gửi socket data này: `42["force disconnect","ADMIN","574a94b04f303f5663e833b883cd2b23"]`
+và lấy được sessionID của admin.
+
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/c2956cfa-9ed1-467d-a871-d5d71e9f9a8d)
+
+gọi tới `force disconnect` và truyền vào secret key của admin.
+
+Kết quả trả về session của admin
+
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/db325d23-b2f8-4f15-8091-7e11c12ba7e8)
+
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/e7715bd0-dc46-47a5-89f6-a9f64224bfec)
+Mình truy cập admin thành công.
+
+Flag: `CHH{H4ve_y0u_re4d_th3_m3ssage_a83fdd979f7c7875d64e4575b64f7057}`
+
 
 # Forensic chanllenge
 Tiếp theo là một số thử thách về Forensic mình giải được nhé. ☣️ Mình không có nhiều kinh nghiệm forensic và các mảng khác nên các bài này mình sẽ làm dựa trên google và những gì mình thôi nhé vì đây là CTF cá nhân nên cần càng nhiều point càng tốt 🔯. Hy vọng không bị bắt bẻ. Mình chỉ muốn học hỏi thêm để lỡ sau va chạm thực tế có thể sẽ gặp phải còn đỡ bỡ ngỡ. Một phần cũng muốn chứng minh mình đã cố gắng giải các thử thách này trong quá trình diễn ra CTF. 
-Một phần thì, các thử thách của anh `BQUAMAN` thực sự rất hay. 👩‍❤️‍👩 Quá đã  ~~~ 🌶️
+Một phần thì, các thử thách của anh `BQUANMAN` thực sự rất hay. 👩‍❤️‍👩 Quá đã  ~~~ 🌶️
 
 ## Tin học văn phòng cơ bản
 ### Mô tả
