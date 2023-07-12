@@ -43,3 +43,6 @@ Output:
 <p>The page '<str>HTB{t3mpl4t3s_4r3_m0r3_p0w3rfu1_th4n_u_th1nk!}
 </str>' could not be found</p>
 ```
+
+![image](https://github.com/TaiPhung217/CTF_writeup/assets/102504154/9f7a11c9-b246-4b99-8c17-b8f7ed3950b1)
+
